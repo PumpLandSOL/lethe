@@ -1,7 +1,7 @@
 {
-  "name": "styx-arc",
+  "name": "lethe",
   "version": "1.0.0",
-  "description": "STYX (sUSD/$STYX) — a private, fractional-algorithmic stablecoin on Robinhood Chain. The coin for the crossing.",
+  "description": "LETHE (lUSD/$LETHE) — a private, fractional-algorithmic stablecoin on Robinhood Chain. The coin for the crossing.",
   "main": "server/index.js",
   "scripts": { "start": "node server/index.js" },
   "engines": { "node": ">=18" },

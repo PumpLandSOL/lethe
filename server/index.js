@@ -1,7 +1,7 @@
-// STYX — a private, fractional-algorithmic stablecoin on Arc (Rite I: off-chain ledger, real privacy primitives).
-//   sUSD  : the stablecoin, pegged to $1 (fractional-algorithmic, Frax-style)
-//   STYX  : the governance/share token ($STYX on Arc)
-//   Privacy: shield sUSD -> hold a private balance -> send shielded (amount + parties hidden).
+// LETHE — a private, fractional-algorithmic stablecoin on Arc (Rite I: off-chain ledger, real privacy primitives).
+//   lUSD  : the stablecoin, pegged to $1 (fractional-algorithmic, Frax-style)
+//   LETHE  : the governance/share token ($LETHE on Arc)
+//   Privacy: shield lUSD -> hold a private balance -> send shielded (amount + parties hidden).
 // Real crypto primitives (commitments / nullifiers / x25519-encrypted notes / Merkle tree),
 // but the peg + ledger run off-chain in Rite I and the trustless ZK proof arrives with the on-chain rites.
 // Algorithmic stablecoins are high-risk (see UST/Terra). Dependency-free.
@@ -14,11 +14,11 @@ const { generateKeyPairSync, sign, createHash, createHmac, randomBytes, randomIn
 const PORT = process.env.PORT || 8206;
 const ROOT = path.join(__dirname, '..');
 const DATA_PATH = process.env.DATA_PATH || path.join(ROOT, 'data.json');
-const STABLE = 'sUSD', GOV = 'STYX';
-const STYX_MINT = process.env.STYX_MINT || '';   // $STYX · Arc · LIVE
-const TREASURY = (process.env.TREASURY || '0x0000000000000000000000000000000000000000');            // $STYX on Arc — CA bar lights when set
+const STABLE = 'lUSD', GOV = 'LETHE';
+const LETHE_MINT = process.env.LETHE_MINT || '';   // $LETHE · Arc · LIVE
+const TREASURY = (process.env.TREASURY || '0x0000000000000000000000000000000000000000');            // $LETHE on Arc — CA bar lights when set
 const TICK_SEC = +(process.env.TICK_SEC || 5);
-const SEED = { usdg: 0, styx: 0, susd: 0, priv: 0 };   // real deposits only — nothing is seeded
+const SEED = { usdg: 0, lethe: 0, lusd: 0, priv: 0 };   // real deposits only — nothing is seeded
 
 const B58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
 function base58(buf) { let n = BigInt('0x' + Buffer.from(buf).toString('hex')); let o = ''; while (n > 0n) { o = B58[Number(n % 58n)] + o; n /= 58n; } for (const b of buf) { if (b === 0) o = '1' + o; else break; } return o || '1'; }
@@ -27,9 +27,9 @@ const rawX = (pk) => { const d = pk.export({ type: 'spki', format: 'der' }); ret
 
 // ---------- protocol state ----------
 let db = {
-  susdPrice: 1.0, susdSupply: 1_250_000, styxPrice: 0.85, styxSupply: 100_000_000,
+  lusdPrice: 1.0, lusdSupply: 1_250_000, lethePrice: 0.85, letheSupply: 100_000_000,
   cr: 0.9,                       // collateral ratio (fractional-algorithmic)
-  collateralUsd: 1_125_000,      // ETH+USDC reserves backing sUSD
+  collateralUsd: 1_125_000,      // ETH+USDC reserves backing lUSD
   lastTick: Date.now(), wallets: {},
   shielded: { commitments: [], nullifiers: 0, notes: 0, totalValue: 0, txCount: 0, root: base58(sha('empty')), feed: [] },
 };
@@ -38,15 +38,15 @@ if (!db.wallets) db.wallets = {};
 if (db.v !== 2) { db.wallets = {}; db.v = 2; }   // v2: real deposits only — the seeded paper ledger is wiped
 if (!db.shielded) db.shielded = { commitments: [], nullifiers: 0, notes: 0, totalValue: 0, txCount: 0, root: base58(sha('empty')), feed: [] };
 if (!db.shielded.feed) db.shielded.feed = [];
-// ---------- THE PYRE: ferry toll -> STYX buyback & burn ----------
+// ---------- THE PYRE: ferry toll -> LETHE buyback & burn ----------
 const TOLL = { shield: 0.003, send: 0.003, unshield: 0.003, redeem: 0.005 }; // 30 / 30 / 30 / 50 bps
 const PYRE_MIN_USD = 25;
-if (!db.pyre) db.pyre = { tollUsd: 0, burnedStyx: 0, burnedUsd: 0, epochs: 0, burns: [] };
+if (!db.pyre) db.pyre = { tollUsd: 0, burnedLethe: 0, burnedUsd: 0, epochs: 0, burns: [] };
 const pyre = db.pyre;
 const FERRY_CUT = +(process.env.FERRY_CUT || 0.20);   // share of every toll that goes to the wallet who brought the payer across
 function toll(kind, amt, w) {
   const f = amt * TOLL[kind]; let cut = 0;
-  if (w && w.ref && db.wallets[w.ref]) { cut = f * FERRY_CUT; const fm = db.wallets[w.ref]; fm.susd += cut; fm.earned = (fm.earned || 0) + cut; db.ferry.paid += cut; }
+  if (w && w.ref && db.wallets[w.ref]) { cut = f * FERRY_CUT; const fm = db.wallets[w.ref]; fm.lusd += cut; fm.earned = (fm.earned || 0) + cut; db.ferry.paid += cut; }
   pyre.tollUsd += f - cut; return amt - f;
 }
 if (!db.ferry) db.ferry = { paid: 0, souls: 0 };
@@ -55,14 +55,14 @@ const redact = (addr) => addr.slice(0, 4) + '████' + addr.slice(-4);
 function ferrymen() { return Object.entries(db.wallets).filter(([, x]) => (x.souls || 0) > 0).map(([addr, x]) => ({ who: redact(addr), souls: x.souls || 0, earned: x.earned || 0 })).sort((p, q) => q.souls - p.souls || q.earned - p.earned).slice(0, 10); }
 function pyreBurn(now) {
   if (pyre.tollUsd < PYRE_MIN_USD) return;
-  const usd = pyre.tollUsd; const px = Math.max(0.0001, db.styxPrice); const styx = usd / px;
-  db.styxSupply = Math.max(0, db.styxSupply - styx); pyre.tollUsd = 0; pyre.burnedStyx += styx; pyre.burnedUsd += usd; pyre.epochs++;
-  const id = base58(sha('pyre|' + pyre.epochs + '|' + usd.toFixed(6) + '|' + styx.toFixed(6) + '|' + now));
-  pyre.burns.unshift({ id, usd, styx, px, ts: now, epoch: pyre.epochs }); if (pyre.burns.length > 40) pyre.burns.pop();
+  const usd = pyre.tollUsd; const px = Math.max(0.0001, db.lethePrice); const lethe = usd / px;
+  db.letheSupply = Math.max(0, db.letheSupply - lethe); pyre.tollUsd = 0; pyre.burnedLethe += lethe; pyre.burnedUsd += usd; pyre.epochs++;
+  const id = base58(sha('pyre|' + pyre.epochs + '|' + usd.toFixed(6) + '|' + lethe.toFixed(6) + '|' + now));
+  pyre.burns.unshift({ id, usd, lethe, px, ts: now, epoch: pyre.epochs }); if (pyre.burns.length > 40) pyre.burns.pop();
 }
 let saveT = null; function save() { if (saveT) return; saveT = setTimeout(() => { saveT = null; try { fs.writeFileSync(DATA_PATH, JSON.stringify(db)); } catch (e) {} }, 800); }
 const isWallet = (s) => /^0x[a-fA-F0-9]{40}$/.test(s);
-function W(a) { a = a.toLowerCase(); return db.wallets[a] || (db.wallets[a] = { usdg: SEED.usdg, styx: SEED.styx, susd: SEED.susd, priv: SEED.priv, seeded: true }); }
+function W(a) { a = a.toLowerCase(); return db.wallets[a] || (db.wallets[a] = { usdg: SEED.usdg, lethe: SEED.lethe, lusd: SEED.lusd, priv: SEED.priv, seeded: true }); }
 
 // ---------- chain: real USDC deposits to TREASURY, verified on-chain ----------
 const USDG = { addr: 'native', dec: 18, native: true };   // USDC is Arc's native gas token (18 dp)
@@ -70,7 +70,7 @@ const RPCS = (process.env.ARC_RPCS || process.env.RH_RPCS || 'https://rpc.mainne
 const ARC = { id: 5042, hex: '0x13b2', name: 'Arc', explorer: 'https://explorer.arc.io' };
 const MIN_DEPOSIT = +(process.env.MIN_DEPOSIT || 50);   // USDC — smaller transfers are NOT credited
 const TRANSFER_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
-const CHAIN = { ok: false, block: 0, treasuryUsdg: 0, treasuryStyx: 0, lastRead: 0, errs: 0 };
+const CHAIN = { ok: false, block: 0, treasuryUsdg: 0, treasuryLethe: 0, lastRead: 0, errs: 0 };
 const hexToNum = (h, dec) => { if (!h || h === '0x') return 0; const bi = BigInt(h); const d = 10n ** BigInt(dec || 18); return Number(bi / d) + Number(bi % d) / Number(d); };
 async function rpc(method, params) {
   let err; for (const u of RPCS) { try { const ac = new AbortController(); const tm = setTimeout(() => ac.abort(), 8000);
@@ -79,7 +79,7 @@ async function rpc(method, params) {
   throw err || new Error('rpc');
 }
 const balOf = (token, dec, who) => rpc('eth_call', [{ to: token, data: '0x70a08231' + who.slice(2).padStart(64, '0') }, 'latest']).then((r) => hexToNum(r, dec));
-async function pollChain() { try { CHAIN.block = Number(BigInt(await rpc('eth_blockNumber', []))); CHAIN.treasuryUsdg = hexToNum(await rpc('eth_getBalance', [TREASURY, 'latest']), 18); CHAIN.treasuryStyx = STYX_MINT ? await balOf(STYX_MINT, 18, TREASURY) : 0; CHAIN.ok = true; CHAIN.lastRead = Date.now(); } catch (e) { CHAIN.ok = false; } }
+async function pollChain() { try { CHAIN.block = Number(BigInt(await rpc('eth_blockNumber', []))); CHAIN.treasuryUsdg = hexToNum(await rpc('eth_getBalance', [TREASURY, 'latest']), 18); CHAIN.treasuryLethe = LETHE_MINT ? await balOf(LETHE_MINT, 18, TREASURY) : 0; CHAIN.ok = true; CHAIN.lastRead = Date.now(); } catch (e) { CHAIN.ok = false; } }
 setInterval(pollChain, 30000); pollChain();
 if (!db.txs) db.txs = {};
 if (!db.treasuryIn) db.treasuryIn = { usdg: 0, n: 0 };
@@ -101,27 +101,27 @@ async function creditDeposit(w, txHash) {
 if (!db.queue) db.queue = [];
 const ADMIN_KEY = process.env.ADMIN_KEY || '';
 
-// ---------- THE VIGIL: temporary sUSD staking, paid in $STYX from a FIXED pre-funded pool. No printing. Hard end. ----------
+// ---------- THE VIGIL: temporary lUSD staking, paid in $LETHE from a FIXED pre-funded pool. No printing. Hard end. ----------
 const VIGIL = {
-  apy: +(process.env.VIGIL_APY || 0.40),               // 40% APY, in sUSD terms
-  pool: +(process.env.VIGIL_POOL || 5_000_000),         // STYX set aside by the treasury for the whole season
-  cap: +(process.env.VIGIL_CAP || 250_000),             // max sUSD staked protocol-wide
+  apy: +(process.env.VIGIL_APY || 0.40),               // 40% APY, in lUSD terms
+  pool: +(process.env.VIGIL_POOL || 5_000_000),         // LETHE set aside by the treasury for the whole season
+  cap: +(process.env.VIGIL_CAP || 250_000),             // max lUSD staked protocol-wide
   start: +(process.env.VIGIL_START || 1),                // OPEN NOW (2026-09-09)
   end: +(process.env.VIGIL_END || 1791676800000),       // 2026-10-11 00:00 UTC — 30 days, then it is over
 };
-if (!db.vigil) db.vigil = { staked: 0, paidStyx: 0, paidUsd: 0, stakers: 0 };
+if (!db.vigil) db.vigil = { staked: 0, paidLethe: 0, paidUsd: 0, stakers: 0 };
 const VIGIL_BOOST = { apy: +(process.env.VIGIL_BOOST_APY || 1.00), end: +(process.env.VIGIL_BOOST_END || 1789603200000) };   // 100% APY through 2026-09-17, then back to VIGIL.apy
 const vigilApy = (now) => now < VIGIL_BOOST.end ? VIGIL_BOOST.apy : VIGIL.apy;
-function vigilLive(now) { return now >= VIGIL.start && now < VIGIL.end && db.vigil.paidStyx < VIGIL.pool; }
-function accrue(u, now) {   // reward accrues in sUSD terms per second while the vigil is live
+function vigilLive(now) { return now >= VIGIL.start && now < VIGIL.end && db.vigil.paidLethe < VIGIL.pool; }
+function accrue(u, now) {   // reward accrues in lUSD terms per second while the vigil is live
   if (!u.stake) return; const t0 = u.stakeT || now; const t1 = Math.min(now, VIGIL.end);
   if (t1 > t0 && vigilLive(t0)) u.stakeAcc = (u.stakeAcc || 0) + u.stake * vigilApy(t0) * (t1 - t0) / 31536000000;
   u.stakeT = now;
 }
-function vigilView(u, now) { accrue(u, now); const px = Math.max(0.000001, db.styxPrice); return { staked: u.stake || 0, accruedUsd: u.stakeAcc || 0, accruedStyx: (u.stakeAcc || 0) / px, since: u.stakeSince || null }; }
+function vigilView(u, now) { accrue(u, now); const px = Math.max(0.000001, db.lethePrice); return { staked: u.stake || 0, accruedUsd: u.stakeAcc || 0, accruedLethe: (u.stakeAcc || 0) / px, since: u.stakeSince || null }; }
 
 // ---------- RITE III: The Note (pay links) + The Seal (view keys) ----------
-//   The Note : lock shielded sUSD behind a secret; anyone holding the link claims it into their own shielded balance.
+//   The Note : lock shielded lUSD behind a secret; anyone holding the link claims it into their own shielded balance.
 //              No recipient address is ever named. On the ledger it is one nullifier + one commitment, like any private send.
 //   The Seal : a read-only view key. Whoever holds it can read your private balance and history and can never spend.
 //              Selective disclosure — show an auditor, a partner, a court exactly what you choose, and nobody else.
@@ -132,25 +132,25 @@ const linkId = (secret) => base58(sha('note|' + secret));
 function viewKeyOf(addr) { const mac = createHmac('sha256', db.viewSalt).update('seal|' + addr.toLowerCase()).digest().subarray(0, 16); return base58(Buffer.concat([Buffer.from(addr.slice(2), 'hex'), mac])); }
 function walletOfViewKey(key) { try { let n = 0n; for (const ch of key) { const i = B58.indexOf(ch); if (i < 0) return null; n = n * 58n + BigInt(i); } let hex = n.toString(16); if (hex.length % 2) hex = '0' + hex; let buf = Buffer.from(hex, 'hex'); let lead = 0; for (const ch of key) { if (ch === '1') lead++; else break; } buf = Buffer.concat([Buffer.alloc(lead), buf]); if (buf.length !== 36) return null; const addr = '0x' + buf.subarray(0, 20).toString('hex'); return viewKeyOf(addr) === key ? addr : null; } catch (e) { return null; } }
 
-// ---------- BONDS: USDC in, discounted $STYX out, vested. The USDC stays in reserve and mints NOTHING, so every bond over-collateralizes sUSD. ----------
+// ---------- BONDS: USDC in, discounted $LETHE out, vested. The USDC stays in reserve and mints NOTHING, so every bond over-collateralizes lUSD. ----------
 const BOND = {
   discount: +(process.env.BOND_DISCOUNT || 0.20),          // 20% below market
   vestMs: +(process.env.BOND_VEST_DAYS || 5) * 864e5,      // linear vest
   capUsd: +(process.env.BOND_CAP_USD || 5000),             // per-day capacity
   end: +(process.env.BOND_END || 1791676800000),  // same close as the vigil
-  // THE FORGE: lock the bond. Deeper discount, hard 48-hour lock, and the locked STYX earns APY in STYX paid from the Vigil pool (fixed, no printing).
+  // THE FORGE: lock the bond. Deeper discount, hard 48-hour lock, and the locked LETHE earns APY in LETHE paid from the Vigil pool (fixed, no printing).
   lockDiscount: +(process.env.FORGE_DISCOUNT || 0.30), lockMs: +(process.env.FORGE_LOCK_DAYS || 2) * 864e5, lockApy: +(process.env.FORGE_APY || 0.80),
   min: 50,
 };
-if (!db.bonds) db.bonds = { soldUsd: 0, soldStyx: 0, n: 0, day: 0, dayUsd: 0 };
-if (!db.forge) db.forge = { lockedStyx: 0, usd: 0, n: 0, yieldStyx: 0 };
-const forgePrice = () => Math.max(0.000001, db.styxPrice) * (1 - BOND.lockDiscount);
-const forgeYield = (b, now) => b.lock ? b.styx * BOND.lockApy * (Math.min(now, b.ts + BOND.lockMs) - b.ts) / 31536000000 : 0;
+if (!db.bonds) db.bonds = { soldUsd: 0, soldLethe: 0, n: 0, day: 0, dayUsd: 0 };
+if (!db.forge) db.forge = { lockedLethe: 0, usd: 0, n: 0, yieldLethe: 0 };
+const forgePrice = () => Math.max(0.000001, db.lethePrice) * (1 - BOND.lockDiscount);
+const forgeYield = (b, now) => b.lock ? b.lethe * BOND.lockApy * (Math.min(now, b.ts + BOND.lockMs) - b.ts) / 31536000000 : 0;
 function bondDay() { const d = Math.floor(Date.now() / 864e5); if (db.bonds.day !== d) { db.bonds.day = d; db.bonds.dayUsd = 0; } return db.bonds; }
-const bondPrice = () => Math.max(0.000001, db.styxPrice) * (1 - BOND.discount);
-function bondView(u, now) { const list = (u.bonds || []).map((b) => { const len = b.lock ? BOND.lockMs : BOND.vestMs; let k = Math.min(1, Math.max(0, (now - b.ts) / len)); if (b.lock && k < 1) k = 0; const vested = b.styx * k; const y = forgeYield(b, now); return { id: b.id, usd: b.usd, styx: b.styx, price: b.price, ts: b.ts, lock: !!b.lock, vestEnd: b.ts + len, vested, yieldStyx: y, claimable: Math.max(0, vested - b.claimed) + (b.lock && k >= 1 && !b.yieldPaid ? y : 0), claimed: b.claimed }; }); return { list, claimable: list.reduce((x, b) => x + b.claimable, 0), pending: list.reduce((x, b) => x + (b.styx - b.claimed), 0), locked: list.filter((b) => b.lock && b.claimed < b.styx).reduce((x, b) => x + b.styx, 0), forging: list.filter((b) => b.lock && b.claimed < b.styx).reduce((x, b) => x + b.yieldStyx, 0) }; }
+const bondPrice = () => Math.max(0.000001, db.lethePrice) * (1 - BOND.discount);
+function bondView(u, now) { const list = (u.bonds || []).map((b) => { const len = b.lock ? BOND.lockMs : BOND.vestMs; let k = Math.min(1, Math.max(0, (now - b.ts) / len)); if (b.lock && k < 1) k = 0; const vested = b.lethe * k; const y = forgeYield(b, now); return { id: b.id, usd: b.usd, lethe: b.lethe, price: b.price, ts: b.ts, lock: !!b.lock, vestEnd: b.ts + len, vested, yieldLethe: y, claimable: Math.max(0, vested - b.claimed) + (b.lock && k >= 1 && !b.yieldPaid ? y : 0), claimed: b.claimed }; }); return { list, claimable: list.reduce((x, b) => x + b.claimable, 0), pending: list.reduce((x, b) => x + (b.lethe - b.claimed), 0), locked: list.filter((b) => b.lock && b.claimed < b.lethe).reduce((x, b) => x + b.lethe, 0), forging: list.filter((b) => b.lock && b.claimed < b.lethe).reduce((x, b) => x + b.yieldLethe, 0) }; }
 
-// ---------- THE DARK POOL: shielded 1x exposure to tokenized stocks, priced off the exchange tape, settled in shielded sUSD ----------
+// ---------- THE DARK POOL: shielded 1x exposure to tokenized stocks, priced off the exchange tape, settled in shielded lUSD ----------
 //   Ticker, size, side and P&L live inside the shield. The ledger sees one nullifier + one commitment per open/close, same as any private send.
 //   No leverage. Position and open-interest caps. Tape must be fresh (< 15 min) or the market is closed to new trades. Shorts are capped at 95% loss.
 const YF = 'https://query1.finance.yahoo.com/v8/finance/chart/';
@@ -200,27 +200,27 @@ const sh = db.shielded;
 function pushShTx(tx) { sh.feed.unshift(tx); if (sh.feed.length > 60) sh.feed.pop(); sh.txCount++; if (sh.commitments.length > 1024) sh.commitments = sh.commitments.slice(-1024); sh.root = merkleRoot(sh.commitments); }
 function shieldNote(amount, recipPub) { const bl = base58(randomBytes(8)); const C = commitTo(amount, recipPub ? base58(rawX(recipPub)) : 'anon', bl); sh.commitments.push(C); sh.notes++; return { C, note: encNote(recipPub || shKeys[0].pub, amount + '|' + bl) }; }
 
-// ---------- $STYX price: Arc pools (DexScreener) when STYX_MINT is set ----------
-let STYX_LIVE = { px: 0, liq: 0, pair: '', t: 0 };
-async function pollStyx() {
-  if (!STYX_MINT) return;
-  try { const r = await fetch('https://api.dexscreener.com/latest/dex/tokens/' + STYX_MINT); if (!r.ok) return;
+// ---------- $LETHE price: Arc pools (DexScreener) when LETHE_MINT is set ----------
+let LETHE_LIVE = { px: 0, liq: 0, pair: '', t: 0 };
+async function pollLethe() {
+  if (!LETHE_MINT) return;
+  try { const r = await fetch('https://api.dexscreener.com/latest/dex/tokens/' + LETHE_MINT); if (!r.ok) return;
     const ps = ((await r.json()).pairs || []).filter((p) => p.chainId === 'arc' && +p.priceUsd > 0).sort((a, b) => ((b.liquidity && b.liquidity.usd) || 0) - ((a.liquidity && a.liquidity.usd) || 0));
-    if (ps[0]) { STYX_LIVE = { px: +ps[0].priceUsd, liq: (ps[0].liquidity && ps[0].liquidity.usd) || 0, pair: ps[0].pairAddress || '', t: Date.now() }; db.styxPrice = STYX_LIVE.px; } } catch (e) {}
+    if (ps[0]) { LETHE_LIVE = { px: +ps[0].priceUsd, liq: (ps[0].liquidity && ps[0].liquidity.usd) || 0, pair: ps[0].pairAddress || '', t: Date.now() }; db.lethePrice = LETHE_LIVE.px; } } catch (e) {}
 }
-setInterval(pollStyx, 20000); pollStyx();
+setInterval(pollLethe, 20000); pollLethe();
 
 // ---------- peg / algo tick ----------
 function tick() {
   const now = Date.now(); const dt = (now - db.lastTick) / 1000; if (dt < TICK_SEC) return; db.lastTick = now;
-  // mean-reverting sUSD price around $1
-  db.susdPrice += (1 - db.susdPrice) * 0.18 + (Math.random() - 0.5) * 0.0035;
-  db.susdPrice = Math.max(0.97, Math.min(1.03, db.susdPrice));
+  // mean-reverting lUSD price around $1
+  db.lusdPrice += (1 - db.lusdPrice) * 0.18 + (Math.random() - 0.5) * 0.0035;
+  db.lusdPrice = Math.max(0.97, Math.min(1.03, db.lusdPrice));
   // algorithmic collateral ratio: above peg -> lower CR (more algo); below -> raise CR (more backing)
-  const target = db.susdPrice > 1.001 ? db.cr - 0.01 : db.susdPrice < 0.999 ? db.cr + 0.01 : db.cr;
+  const target = db.lusdPrice > 1.001 ? db.cr - 0.01 : db.lusdPrice < 0.999 ? db.cr + 0.01 : db.cr;
   db.cr += (Math.max(0.55, Math.min(1, target)) - db.cr) * 0.25;
-  // STYX price drifts (captures protocol value)
-  if (!STYX_LIVE.px) db.styxPrice = Math.max(0.05, db.styxPrice * (1 + (Math.random() - 0.49) * 0.02));
+  // LETHE price drifts (captures protocol value)
+  if (!LETHE_LIVE.px) db.lethePrice = Math.max(0.05, db.lethePrice * (1 + (Math.random() - 0.49) * 0.02));
   // simulated shielded activity (keeps the privacy pool alive)
   const n = randomInt(0, 3);
   for (let i = 0; i < n; i++) {
@@ -236,22 +236,22 @@ function tick() {
 // ---------- views ----------
 const num = (v, hi) => { let n = +v; if (!isFinite(n) || n <= 0) return 0; return hi != null ? Math.min(n, hi) : n; };
 function metrics() {
-  const backing = db.collateralUsd / Math.max(1, db.susdSupply);
+  const backing = db.collateralUsd / Math.max(1, db.lusdSupply);
   return {
-    stable: STABLE, gov: GOV, mint: STYX_MINT, treasury: TREASURY, network: 'arc', chainId: 4663, explorer: 'https://explorer.mainnet.chain.arc.com', styxLive: STYX_LIVE.px ? STYX_LIVE : null, peg: 1.0,
-    susdPrice: +db.susdPrice.toFixed(4), pegStatus: db.susdPrice >= 1.001 ? 'above' : db.susdPrice <= 0.999 ? 'below' : 'at',
-    susdSupply: db.susdSupply, susdMarketCap: db.susdPrice * db.susdSupply,
+    stable: STABLE, gov: GOV, mint: LETHE_MINT, treasury: TREASURY, network: 'arc', chainId: 4663, explorer: 'https://explorer.mainnet.chain.arc.com', letheLive: LETHE_LIVE.px ? LETHE_LIVE : null, peg: 1.0,
+    lusdPrice: +db.lusdPrice.toFixed(4), pegStatus: db.lusdPrice >= 1.001 ? 'above' : db.lusdPrice <= 0.999 ? 'below' : 'at',
+    lusdSupply: db.lusdSupply, lusdMarketCap: db.lusdPrice * db.lusdSupply,
     cr: db.cr, collateralUsd: db.collateralUsd, backingRatio: backing,
-    styxPrice: db.styxPrice, styxSupply: db.styxSupply, styxMarketCap: db.styxPrice * db.styxSupply,
-    minDeposit: MIN_DEPOSIT, chain: { ok: CHAIN.ok, block: CHAIN.block, treasuryUsdg: CHAIN.treasuryUsdg, treasuryStyx: CHAIN.treasuryStyx, lastRead: CHAIN.lastRead, usdg: USDG.addr, native: true, id: ARC.id, hex: ARC.hex, name: ARC.name, explorer: ARC.explorer, rpc: RPCS[0] },
-    deposits: { usdg: db.treasuryIn.usdg, n: db.treasuryIn.n }, dark: { markets: Object.keys(DARK_FEED).map((sym) => ({ sym, px: TAPE[sym] ? TAPE[sym].px : null, ts: TAPE[sym] ? TAPE[sym].ts : null, fresh: tapeFresh(sym) })), open: db.dark.open, opened: db.dark.opened, closed: db.dark.closed, volume: db.dark.volume, fees: db.dark.fees, liqs: db.dark.liqs, fee: DARK.fee, maxPos: DARK.maxPos, maxOi: DARK.maxOi, full: db.dark.oi >= DARK.maxOi }, bonds: (() => { const B = bondDay(); return { discount: BOND.discount, vestDays: BOND.vestMs / 864e5, capUsd: BOND.capUsd, leftToday: Math.max(0, BOND.capUsd - B.dayUsd), soldUsd: B.soldUsd, soldStyx: B.soldStyx, n: B.n, price: bondPrice(), market: db.styxPrice, end: BOND.end, open: Date.now() <= BOND.end, min: BOND.min, forge: { discount: BOND.lockDiscount, lockDays: BOND.lockMs / 864e5, apy: BOND.lockApy, price: forgePrice(), lockedStyx: db.forge.lockedStyx, usd: db.forge.usd, n: db.forge.n, yieldStyx: db.forge.yieldStyx } }; })(), ferry: { cut: FERRY_CUT, souls: db.ferry.souls, paid: db.ferry.paid, board: ferrymen() }, notes: { created: Object.keys(db.links).length, open: Object.values(db.links).filter((L) => !L.claimed).length, claimed: Object.values(db.links).filter((L) => L.claimed).length }, queue: { open: db.queue.filter((q) => q.status === 'queued').length, openUsd: db.queue.filter((q) => q.status === 'queued').reduce((a, q) => a + q.amt, 0), paid: db.queue.filter((q) => q.status === 'paid').length },
-    vigil: { ...VIGIL, apy: vigilApy(Date.now()), baseApy: VIGIL.apy, boost: { apy: VIGIL_BOOST.apy, end: VIGIL_BOOST.end, live: Date.now() < VIGIL_BOOST.end, endsIn: Math.max(0, VIGIL_BOOST.end - Date.now()) }, live: vigilLive(Date.now()), staked: db.vigil.staked, stakers: db.vigil.stakers, paidStyx: db.vigil.paidStyx, paidUsd: db.vigil.paidUsd, poolLeft: Math.max(0, VIGIL.pool - db.vigil.paidStyx), poolLeftUsd: Math.max(0, VIGIL.pool - db.vigil.paidStyx) * db.styxPrice, endsIn: Math.max(0, VIGIL.end - Date.now()), startsIn: Math.max(0, VIGIL.start - Date.now()) },
-    pyre: { tollUsd: pyre.tollUsd, burnedStyx: pyre.burnedStyx, burnedUsd: pyre.burnedUsd, epochs: pyre.epochs, minUsd: PYRE_MIN_USD, bps: { shield: 30, send: 30, unshield: 30, redeem: 50 }, burns: pyre.burns.slice(0, 8).map((b) => ({ id: b.id.slice(0, 8) + '…' + b.id.slice(-4), usd: b.usd, styx: b.styx, px: b.px, ts: b.ts, epoch: b.epoch })) },
+    lethePrice: db.lethePrice, letheSupply: db.letheSupply, letheMarketCap: db.lethePrice * db.letheSupply,
+    minDeposit: MIN_DEPOSIT, chain: { ok: CHAIN.ok, block: CHAIN.block, treasuryUsdg: CHAIN.treasuryUsdg, treasuryLethe: CHAIN.treasuryLethe, lastRead: CHAIN.lastRead, usdg: USDG.addr, native: true, id: ARC.id, hex: ARC.hex, name: ARC.name, explorer: ARC.explorer, rpc: RPCS[0] },
+    deposits: { usdg: db.treasuryIn.usdg, n: db.treasuryIn.n }, dark: { markets: Object.keys(DARK_FEED).map((sym) => ({ sym, px: TAPE[sym] ? TAPE[sym].px : null, ts: TAPE[sym] ? TAPE[sym].ts : null, fresh: tapeFresh(sym) })), open: db.dark.open, opened: db.dark.opened, closed: db.dark.closed, volume: db.dark.volume, fees: db.dark.fees, liqs: db.dark.liqs, fee: DARK.fee, maxPos: DARK.maxPos, maxOi: DARK.maxOi, full: db.dark.oi >= DARK.maxOi }, bonds: (() => { const B = bondDay(); return { discount: BOND.discount, vestDays: BOND.vestMs / 864e5, capUsd: BOND.capUsd, leftToday: Math.max(0, BOND.capUsd - B.dayUsd), soldUsd: B.soldUsd, soldLethe: B.soldLethe, n: B.n, price: bondPrice(), market: db.lethePrice, end: BOND.end, open: Date.now() <= BOND.end, min: BOND.min, forge: { discount: BOND.lockDiscount, lockDays: BOND.lockMs / 864e5, apy: BOND.lockApy, price: forgePrice(), lockedLethe: db.forge.lockedLethe, usd: db.forge.usd, n: db.forge.n, yieldLethe: db.forge.yieldLethe } }; })(), ferry: { cut: FERRY_CUT, souls: db.ferry.souls, paid: db.ferry.paid, board: ferrymen() }, notes: { created: Object.keys(db.links).length, open: Object.values(db.links).filter((L) => !L.claimed).length, claimed: Object.values(db.links).filter((L) => L.claimed).length }, queue: { open: db.queue.filter((q) => q.status === 'queued').length, openUsd: db.queue.filter((q) => q.status === 'queued').reduce((a, q) => a + q.amt, 0), paid: db.queue.filter((q) => q.status === 'paid').length },
+    vigil: { ...VIGIL, apy: vigilApy(Date.now()), baseApy: VIGIL.apy, boost: { apy: VIGIL_BOOST.apy, end: VIGIL_BOOST.end, live: Date.now() < VIGIL_BOOST.end, endsIn: Math.max(0, VIGIL_BOOST.end - Date.now()) }, live: vigilLive(Date.now()), staked: db.vigil.staked, stakers: db.vigil.stakers, paidLethe: db.vigil.paidLethe, paidUsd: db.vigil.paidUsd, poolLeft: Math.max(0, VIGIL.pool - db.vigil.paidLethe), poolLeftUsd: Math.max(0, VIGIL.pool - db.vigil.paidLethe) * db.lethePrice, endsIn: Math.max(0, VIGIL.end - Date.now()), startsIn: Math.max(0, VIGIL.start - Date.now()) },
+    pyre: { tollUsd: pyre.tollUsd, burnedLethe: pyre.burnedLethe, burnedUsd: pyre.burnedUsd, epochs: pyre.epochs, minUsd: PYRE_MIN_USD, bps: { shield: 30, send: 30, unshield: 30, redeem: 50 }, burns: pyre.burns.slice(0, 8).map((b) => ({ id: b.id.slice(0, 8) + '…' + b.id.slice(-4), usd: b.usd, lethe: b.lethe, px: b.px, ts: b.ts, epoch: b.epoch })) },
     shielded: { totalValue: sh.totalValue, notes: sh.notes, nullifiers: sh.nullifiers, txCount: sh.txCount, root: sh.root },
     feed: sh.feed.slice(0, 10).map((t) => ({ sig: t.sig.slice(0, 6) + '…' + t.sig.slice(-4), type: t.type, publicAmount: t.publicAmount || null, ts: t.ts })),
   };
 }
-function account(addr) { const w = W(addr); const now = Date.now(); return { wallet: addr, usdg: w.usdg, styx: w.styx, susd: w.susd, priv: w.priv, deposited: w.deposited || 0, dark: darkView(w), bonds: bondView(w, now), ref: w.ref || null, souls: w.souls || 0, earned: w.earned || 0, vigil: vigilView(w, now), queue: db.queue.filter((q) => q.wallet === addr.toLowerCase()).slice(0, 10) }; }
+function account(addr) { const w = W(addr); const now = Date.now(); return { wallet: addr, usdg: w.usdg, lethe: w.lethe, lusd: w.lusd, priv: w.priv, deposited: w.deposited || 0, dark: darkView(w), bonds: bondView(w, now), ref: w.ref || null, souls: w.souls || 0, earned: w.earned || 0, vigil: vigilView(w, now), queue: db.queue.filter((q) => q.wallet === addr.toLowerCase()).slice(0, 10) }; }
 
 // ---------- http ----------
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png' };
@@ -261,7 +261,7 @@ function body(req) { return new Promise((r) => { let b = ''; req.on('data', (c) 
 
 http.createServer(async (req, res) => {
   const u = req.url.split('?')[0];
-  if (u === '/api/config') return json(res, 200, { stable: STABLE, gov: GOV, mint: STYX_MINT, treasury: TREASURY, network: 'arc', chainId: 4663, explorer: 'https://explorer.mainnet.chain.arc.com', styxLive: STYX_LIVE.px ? STYX_LIVE : null });
+  if (u === '/api/config') return json(res, 200, { stable: STABLE, gov: GOV, mint: LETHE_MINT, treasury: TREASURY, network: 'arc', chainId: 4663, explorer: 'https://explorer.mainnet.chain.arc.com', letheLive: LETHE_LIVE.px ? LETHE_LIVE : null });
   if (u === '/api/metrics') return json(res, 200, metrics());
   if (req.method === 'POST') {
     const d = await body(req);
@@ -271,60 +271,60 @@ http.createServer(async (req, res) => {
     if (!isWallet(d.wallet || '')) return json(res, 200, { error: 'connect a wallet first' });
     const w = W(d.wallet);
 
-    if (u === '/api/mint') { // collateral + STYX -> sUSD
+    if (u === '/api/mint') { // collateral + LETHE -> lUSD
       const m = num(d.amount); if (!m) return json(res, 200, { error: 'enter an amount' });
-      const needUsdg = m * db.cr; const algoUsd = m * (1 - db.cr); const burnStyx = algoUsd / db.styxPrice;
+      const needUsdg = m * db.cr; const algoUsd = m * (1 - db.cr); const burnLethe = algoUsd / db.lethePrice;
       if (w.usdg < m) return json(res, 200, { error: 'not enough USDC — deposit first' });
-      // the algorithmic slice is paid in USDC too: it buys STYX at market and burns it via the pyre (nothing is printed to mint sUSD)
-      w.usdg -= m; w.susd += m; db.susdSupply += m; db.collateralUsd += needUsdg; db.styxSupply = Math.max(0, db.styxSupply - burnStyx);
+      // the algorithmic slice is paid in USDC too: it buys LETHE at market and burns it via the pyre (nothing is printed to mint lUSD)
+      w.usdg -= m; w.lusd += m; db.lusdSupply += m; db.collateralUsd += needUsdg; db.letheSupply = Math.max(0, db.letheSupply - burnLethe);
       pyre.tollUsd += algoUsd; save();
-      return json(res, 200, { ok: true, minted: m, usedUsdg: needUsdg, algoUsd, burnedStyx: burnStyx, ...account(d.wallet) });
+      return json(res, 200, { ok: true, minted: m, usedUsdg: needUsdg, algoUsd, burnedLethe: burnLethe, ...account(d.wallet) });
     }
     if (u === '/api/dev/faucet' && process.env.DEV_FAUCET === '1') { w.usdg += num(d.amount) || 0; save(); return json(res, 200, { ok: true, ...account(d.wallet) }); }   // LOCAL TESTING ONLY — never set DEV_FAUCET in production
     if (u === '/api/deposit') { try { const r = await creditDeposit(d.wallet.toLowerCase(), d.tx); return json(res, 200, { ok: true, ...r, ...account(d.wallet) }); } catch (e) { return json(res, 200, { error: String(e.message || e) }); } }
-    if (u === '/api/bond') { // USDC ledger -> discounted STYX, vested. USDC stays in reserve. Nothing minted.
+    if (u === '/api/bond') { // USDC ledger -> discounted LETHE, vested. USDC stays in reserve. Nothing minted.
       const now = Date.now(); if (now > BOND.end) return json(res, 200, { error: 'bonds are closed' });
       const x = num(d.amount, w.usdg); if (!x) return json(res, 200, { error: 'not enough USDC — deposit first' }); if (x < BOND.min) return json(res, 200, { error: 'minimum bond is ' + BOND.min + ' USDC' });
       const B = bondDay(); if (B.dayUsd + x > BOND.capUsd) return json(res, 200, { error: 'today\'s bond capacity is spent — ' + (BOND.capUsd - B.dayUsd).toFixed(2) + ' USDC left' });
-      const lock = !!d.lock; const price = lock ? forgePrice() : bondPrice(); const styx = x / price;
-      w.usdg -= x; db.collateralUsd += x; B.dayUsd += x; B.soldUsd += x; B.soldStyx += styx; B.n++; if (lock) { db.forge.lockedStyx += styx; db.forge.usd += x; db.forge.n++; }
-      w.bonds = w.bonds || []; w.bonds.push({ id: base58(randomBytes(6)), usd: x, styx, price, ts: now, claimed: 0, lock }); hist(w, { type: lock ? 'forge' : 'bond', amt: x }); save();
-      return json(res, 200, { ok: true, bonded: x, styxOut: styx, price, market: db.styxPrice, lock, unlockAt: lock ? now + BOND.lockMs : now + BOND.vestMs, apy: lock ? BOND.lockApy : 0, ...account(d.wallet) });
+      const lock = !!d.lock; const price = lock ? forgePrice() : bondPrice(); const lethe = x / price;
+      w.usdg -= x; db.collateralUsd += x; B.dayUsd += x; B.soldUsd += x; B.soldLethe += lethe; B.n++; if (lock) { db.forge.lockedLethe += lethe; db.forge.usd += x; db.forge.n++; }
+      w.bonds = w.bonds || []; w.bonds.push({ id: base58(randomBytes(6)), usd: x, lethe, price, ts: now, claimed: 0, lock }); hist(w, { type: lock ? 'forge' : 'bond', amt: x }); save();
+      return json(res, 200, { ok: true, bonded: x, letheOut: lethe, price, market: db.lethePrice, lock, unlockAt: lock ? now + BOND.lockMs : now + BOND.vestMs, apy: lock ? BOND.lockApy : 0, ...account(d.wallet) });
     }
-    if (u === '/api/bond/claim') { const now = Date.now(); let got = 0, forged = 0; for (const b of w.bonds || []) { if (b.lock) { if (now < b.ts + BOND.lockMs) continue; const c = b.styx - b.claimed; if (c > 0) { b.claimed = b.styx; got += c; db.forge.lockedStyx = Math.max(0, db.forge.lockedStyx - c); } if (!b.yieldPaid) { let y = forgeYield(b, now); const left = VIGIL.pool - db.vigil.paidStyx; if (y > left) y = Math.max(0, left); b.yieldPaid = true; forged += y; db.vigil.paidStyx += y; db.vigil.paidUsd += y * db.styxPrice; db.forge.yieldStyx += y; } continue; } const k = Math.min(1, (now - b.ts) / BOND.vestMs); const c = Math.max(0, b.styx * k - b.claimed); b.claimed += c; got += c; } if (got + forged < 1e-9) return json(res, 200, { error: 'nothing vested or unlocked yet' }); w.styx += got + forged; save(); return json(res, 200, { ok: true, claimedStyx: got + forged, forgedStyx: forged, ...account(d.wallet) }); }
-    if (u === '/api/withdraw') { // ledger -> payout queue (treasury pays by hand, then marks it paid). asset: USDC (default) or STYX
-      const asset = d.asset === 'STYX' ? 'STYX' : 'USDC';
-      const x = num(d.amount, asset === 'STYX' ? w.styx : w.usdg); if (!x) return json(res, 200, { error: 'nothing to withdraw' }); if (asset === 'USDC' && x < 1) return json(res, 200, { error: 'minimum 1 USDC' });
-      if (asset === 'STYX') w.styx -= x; else w.usdg -= x;
+    if (u === '/api/bond/claim') { const now = Date.now(); let got = 0, forged = 0; for (const b of w.bonds || []) { if (b.lock) { if (now < b.ts + BOND.lockMs) continue; const c = b.lethe - b.claimed; if (c > 0) { b.claimed = b.lethe; got += c; db.forge.lockedLethe = Math.max(0, db.forge.lockedLethe - c); } if (!b.yieldPaid) { let y = forgeYield(b, now); const left = VIGIL.pool - db.vigil.paidLethe; if (y > left) y = Math.max(0, left); b.yieldPaid = true; forged += y; db.vigil.paidLethe += y; db.vigil.paidUsd += y * db.lethePrice; db.forge.yieldLethe += y; } continue; } const k = Math.min(1, (now - b.ts) / BOND.vestMs); const c = Math.max(0, b.lethe * k - b.claimed); b.claimed += c; got += c; } if (got + forged < 1e-9) return json(res, 200, { error: 'nothing vested or unlocked yet' }); w.lethe += got + forged; save(); return json(res, 200, { ok: true, claimedLethe: got + forged, forgedLethe: forged, ...account(d.wallet) }); }
+    if (u === '/api/withdraw') { // ledger -> payout queue (treasury pays by hand, then marks it paid). asset: USDC (default) or LETHE
+      const asset = d.asset === 'LETHE' ? 'LETHE' : 'USDC';
+      const x = num(d.amount, asset === 'LETHE' ? w.lethe : w.usdg); if (!x) return json(res, 200, { error: 'nothing to withdraw' }); if (asset === 'USDC' && x < 1) return json(res, 200, { error: 'minimum 1 USDC' });
+      if (asset === 'LETHE') w.lethe -= x; else w.usdg -= x;
       const q = { id: base58(randomBytes(6)), wallet: d.wallet.toLowerCase(), amt: x, asset, ts: Date.now(), status: 'queued', tx: null }; db.queue.unshift(q); if (db.queue.length > 500) db.queue.pop(); save();
       return json(res, 200, { ok: true, queued: q, ...account(d.wallet) });
     }
     if (u === '/api/admin/queue') { if (!ADMIN_KEY || d.key !== ADMIN_KEY) return json(res, 200, { error: 'no' }); return json(res, 200, { ok: true, queue: db.queue.slice(0, 100), deposits: Object.entries(db.txs).map(([tx, t]) => ({ tx, ...t })).slice(-50) }); }
     if (u === '/api/admin/paid') { if (!ADMIN_KEY || d.key !== ADMIN_KEY) return json(res, 200, { error: 'no' }); const q = db.queue.find((x) => x.id === d.id); if (!q) return json(res, 200, { error: 'no such item' }); q.status = 'paid'; q.tx = d.tx || null; q.paidTs = Date.now(); save(); return json(res, 200, { ok: true, q }); }
-    if (u === '/api/stake') { // sUSD -> the vigil
+    if (u === '/api/stake') { // lUSD -> the vigil
       const now = Date.now(); if (!vigilLive(now)) return json(res, 200, { error: 'the vigil is not open' });
-      const x = num(d.amount, w.susd); if (!x) return json(res, 200, { error: 'nothing to stake' });
-      if (db.vigil.staked + x > VIGIL.cap) return json(res, 200, { error: 'the vigil is full — cap ' + VIGIL.cap.toLocaleString() + ' sUSD' });
-      accrue(w, now); if (!w.stake) { db.vigil.stakers++; w.stakeSince = now; } w.susd -= x; w.stake = (w.stake || 0) + x; w.stakeT = now; db.vigil.staked += x; save();
+      const x = num(d.amount, w.lusd); if (!x) return json(res, 200, { error: 'nothing to stake' });
+      if (db.vigil.staked + x > VIGIL.cap) return json(res, 200, { error: 'the vigil is full — cap ' + VIGIL.cap.toLocaleString() + ' lUSD' });
+      accrue(w, now); if (!w.stake) { db.vigil.stakers++; w.stakeSince = now; } w.lusd -= x; w.stake = (w.stake || 0) + x; w.stakeT = now; db.vigil.staked += x; save();
       return json(res, 200, { ok: true, staked: x, ...account(d.wallet) });
     }
     if (u === '/api/unstake') { const now = Date.now(); accrue(w, now); const x = num(d.amount, w.stake || 0); if (!x) return json(res, 200, { error: 'nothing staked' });
-      const xn = toll('unshield', x, w); w.stake -= x; w.susd += xn; db.vigil.staked = Math.max(0, db.vigil.staked - x); if (w.stake <= 0) { w.stake = 0; db.vigil.stakers = Math.max(0, db.vigil.stakers - 1); } save();
+      const xn = toll('unshield', x, w); w.stake -= x; w.lusd += xn; db.vigil.staked = Math.max(0, db.vigil.staked - x); if (w.stake <= 0) { w.stake = 0; db.vigil.stakers = Math.max(0, db.vigil.stakers - 1); } save();
       return json(res, 200, { ok: true, unstaked: xn, toll: x - xn, ...account(d.wallet) });
     }
     if (u === '/api/claim') { const now = Date.now(); accrue(w, now); const usd = w.stakeAcc || 0; if (usd < 0.01) return json(res, 200, { error: 'nothing to claim yet' });
-      const px = Math.max(0.000001, db.styxPrice); let styx = usd / px; const left = VIGIL.pool - db.vigil.paidStyx; if (left <= 0) return json(res, 200, { error: 'the pool is spent — the vigil is over' }); if (styx > left) styx = left;
-      w.stakeAcc = 0; w.styx += styx; db.vigil.paidStyx += styx; db.vigil.paidUsd += styx * px; save();
-      return json(res, 200, { ok: true, claimedStyx: styx, claimedUsd: styx * px, ...account(d.wallet) });
+      const px = Math.max(0.000001, db.lethePrice); let lethe = usd / px; const left = VIGIL.pool - db.vigil.paidLethe; if (left <= 0) return json(res, 200, { error: 'the pool is spent — the vigil is over' }); if (lethe > left) lethe = left;
+      w.stakeAcc = 0; w.lethe += lethe; db.vigil.paidLethe += lethe; db.vigil.paidUsd += lethe * px; save();
+      return json(res, 200, { ok: true, claimedLethe: lethe, claimedUsd: lethe * px, ...account(d.wallet) });
     }
-    if (u === '/api/redeem') { // sUSD -> collateral + STYX
-      const r = num(d.amount, w.susd); if (!r) return json(res, 200, { error: 'nothing to redeem' });
-      const rn = toll('redeem', r, w); const outUsdg = rn * db.cr; const mintStyx = (rn * (1 - db.cr)) / db.styxPrice;
-      w.susd -= r; w.usdg += outUsdg; w.styx += mintStyx; db.susdSupply = Math.max(0, db.susdSupply - r); db.collateralUsd = Math.max(0, db.collateralUsd - outUsdg); db.styxSupply += mintStyx; save();
-      return json(res, 200, { ok: true, redeemed: r, gotUsdg: outUsdg, gotStyx: mintStyx, ...account(d.wallet) });
+    if (u === '/api/redeem') { // lUSD -> collateral + LETHE
+      const r = num(d.amount, w.lusd); if (!r) return json(res, 200, { error: 'nothing to redeem' });
+      const rn = toll('redeem', r, w); const outUsdg = rn * db.cr; const mintLethe = (rn * (1 - db.cr)) / db.lethePrice;
+      w.lusd -= r; w.usdg += outUsdg; w.lethe += mintLethe; db.lusdSupply = Math.max(0, db.lusdSupply - r); db.collateralUsd = Math.max(0, db.collateralUsd - outUsdg); db.letheSupply += mintLethe; save();
+      return json(res, 200, { ok: true, redeemed: r, gotUsdg: outUsdg, gotLethe: mintLethe, ...account(d.wallet) });
     }
-    if (u === '/api/note/create') { // lock shielded sUSD behind a secret link
-      const x = num(d.amount, w.priv); if (!x) return json(res, 200, { error: 'not enough private balance' }); if (x < 1) return json(res, 200, { error: 'minimum 1 sUSD' });
+    if (u === '/api/note/create') { // lock shielded lUSD behind a secret link
+      const x = num(d.amount, w.priv); if (!x) return json(res, 200, { error: 'not enough private balance' }); if (x < 1) return json(res, 200, { error: 'minimum 1 lUSD' });
       const secret = base58(randomBytes(16)); const id = linkId(secret); const xn = toll('send', x, w);
       w.priv -= x; sh.nullifiers++; const { C, note } = shieldNote(xn, shKeys[randomInt(0, shKeys.length)].pub);
       db.links[id] = { amt: xn, memo: String(d.memo || '').slice(0, 80), ts: Date.now(), claimed: false, by: d.wallet.toLowerCase(), from: base58(sha('from|' + d.wallet.toLowerCase() + '|' + secret)) };
@@ -338,11 +338,11 @@ http.createServer(async (req, res) => {
       return json(res, 200, { ok: true, claimed: L.amt, memo: L.memo, ...account(d.wallet) });
     }
     if (u === '/api/seal') { return json(res, 200, { ok: true, viewKey: viewKeyOf(d.wallet) }); }
-    if (u === '/api/dark/open') { // shielded sUSD -> a hidden position
+    if (u === '/api/dark/open') { // shielded lUSD -> a hidden position
       const sym = String(d.sym || '').toUpperCase(); if (!DARK_FEED[sym]) return json(res, 200, { error: 'unknown market' });
       if (!tapeFresh(sym)) return json(res, 200, { error: sym + ' tape is closed right now — try when the market is open' });
-      const side = d.side === 'short' ? 'short' : 'long'; const x = num(d.amount, w.priv); if (!x) return json(res, 200, { error: 'not enough shielded sUSD' }); if (x < 10) return json(res, 200, { error: 'minimum 10 sUSD' });
-      if (x > DARK.maxPos) return json(res, 200, { error: 'max ' + DARK.maxPos + ' sUSD per position' }); if (db.dark.oi + x > DARK.maxOi) return json(res, 200, { error: 'the pool is full for now' });
+      const side = d.side === 'short' ? 'short' : 'long'; const x = num(d.amount, w.priv); if (!x) return json(res, 200, { error: 'not enough shielded lUSD' }); if (x < 10) return json(res, 200, { error: 'minimum 10 lUSD' });
+      if (x > DARK.maxPos) return json(res, 200, { error: 'max ' + DARK.maxPos + ' lUSD per position' }); if (db.dark.oi + x > DARK.maxOi) return json(res, 200, { error: 'the pool is full for now' });
       const fee = x * DARK.fee; const notional = x - fee; const px = TAPE[sym].px;
       w.priv -= x; pyre.tollUsd += fee; db.dark.fees += fee; db.dark.oi += notional; db.dark.open++; db.dark.opened++; db.dark.volume += notional;
       const p = { id: base58(randomBytes(6)), sym, side, notional, entry: px, ts: Date.now() }; w.dark = w.dark || []; w.dark.push(p); hist(w, { type: 'dark-open', amt: x, memo: sym + ' ' + side });
@@ -351,9 +351,9 @@ http.createServer(async (req, res) => {
     }
     if (u === '/api/dark/close') { const p = (w.dark || []).find((x) => x.id === d.id); if (!p) return json(res, 200, { error: 'no such position' }); if (!tapeFresh(p.sym)) return json(res, 200, { error: p.sym + ' tape is closed — closes settle when the market is open' });
       const r = closePos(w, p, TAPE[p.sym].px, 'user'); save(); return json(res, 200, { ok: true, closed: r, ...account(d.wallet) }); }
-    if (u === '/api/shield') { // public sUSD -> private
-      const s = num(d.amount, w.susd); if (!s) return json(res, 200, { error: 'nothing to shield' });
-      const sn = toll('shield', s, w); w.susd -= s; w.priv += sn; sh.totalValue += sn; hist(w, { type: 'shield', amt: sn }); const { C, note } = shieldNote(sn, shKeys[0].pub);
+    if (u === '/api/shield') { // public lUSD -> private
+      const s = num(d.amount, w.lusd); if (!s) return json(res, 200, { error: 'nothing to shield' });
+      const sn = toll('shield', s, w); w.lusd -= s; w.priv += sn; sh.totalValue += sn; hist(w, { type: 'shield', amt: sn }); const { C, note } = shieldNote(sn, shKeys[0].pub);
       pushShTx({ sig: base58(randomBytes(32)), type: 'shield', commitment: C, note, ts: Date.now() }); save();
       return json(res, 200, { ok: true, shielded: sn, toll: s - sn, ...account(d.wallet) });
     }
@@ -367,13 +367,13 @@ http.createServer(async (req, res) => {
     }
     if (u === '/api/unshield') { // private -> public
       const un = num(d.amount, w.priv); if (!un) return json(res, 200, { error: 'nothing to unshield' });
-      const unn = toll('unshield', un, w); w.priv -= un; w.susd += unn; hist(w, { type: 'unshield', amt: un }); sh.totalValue = Math.max(0, sh.totalValue - un); sh.nullifiers++;
+      const unn = toll('unshield', un, w); w.priv -= un; w.lusd += unn; hist(w, { type: 'unshield', amt: un }); sh.totalValue = Math.max(0, sh.totalValue - un); sh.nullifiers++;
       pushShTx({ sig: base58(randomBytes(32)), type: 'unshield', nullifier: nullifierOf('u', sh.notes), publicAmount: un, ts: Date.now() }); save();
       return json(res, 200, { ok: true, unshielded: unn, toll: un - unn, ...account(d.wallet) });
     }
   }
   serve(req, res);
-}).listen(PORT, () => console.log('STYX (' + STABLE + '/' + GOV + ') on Arc · :' + PORT));
+}).listen(PORT, () => console.log('LETHE (' + STABLE + '/' + GOV + ') on Arc · :' + PORT));
 
 shInit();
 setInterval(tick, 1000);

@@ -1,9 +1,9 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>STYX — sealed statement</title>
+<title>LETHE — sealed statement</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Space+Mono:wght@400;700" rel="stylesheet">
 <style>
-:root{--bg:#f4f8fd;--stone:#ffffff;--stone2:#e9f1fb;--ink:#1b3158;--dim:#41464c;--mut:#7a858e;--gold:#2f578c;--gold2:#e9a13f;--verd:#1f8a5a;--ox:#c9413a;--red:#c9413a;--line:rgba(47,87,140,.18);--line2:rgba(47,87,140,.34)}
+:root{--bg:#05070c;--stone:#0b1220;--stone2:#111a2e;--ink:#e8f0ff;--dim:#a9b8d6;--mut:#5f6f8f;--gold:#3d8bff;--gold2:#9fd8ff;--verd:#3ddc97;--ox:#ff5c6c;--red:#ff5c6c;--line:rgba(61,139,255,.18);--line2:rgba(61,139,255,.34)}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:'DM Sans',serif;font-size:17px}
 .wrap{max-width:860px;margin:0 auto;padding:40px 20px 80px}
 .eye{font-family:'Space Grotesk';font-size:12px;letter-spacing:.3em;color:var(--gold);text-transform:uppercase}
@@ -16,15 +16,15 @@ h1{font-family:'Space Grotesk';font-weight:800;font-size:38px;margin:10px 0 6px}
 table{width:100%;border-collapse:collapse;font-size:15px}th{font-family:'Space Grotesk';font-weight:600;font-size:11px;letter-spacing:.16em;color:var(--dim);text-transform:uppercase;text-align:left;padding:8px 6px;border-bottom:1px solid var(--line2)}
 td{padding:9px 6px;border-bottom:1px solid var(--line);font-family:'Space Mono';font-size:13.5px}td.am{text-align:right;color:var(--ink)}
 .ty{display:inline-block;font-size:10px;letter-spacing:.12em;padding:2px 7px;border:1px solid var(--line2);border-radius:2px;text-transform:uppercase;color:var(--dim)}
-.ty.claimed,.ty.received{color:var(--verd);border-color:rgba(31,138,90,.4)}.ty.note,.ty.sent{color:#ffffff;background:var(--gold);border-color:var(--gold)}
-.seal{font-family:'Space Grotesk';font-size:12px;letter-spacing:.2em;color:var(--verd);border:1px solid rgba(31,138,90,.4);padding:6px 10px;border-radius:2px;display:inline-block;margin-bottom:14px}
+.ty.claimed,.ty.received{color:var(--verd);border-color:rgba(61,220,151,.4)}.ty.note,.ty.sent{color:#0b1220;background:var(--gold);border-color:var(--gold)}
+.seal{font-family:'Space Grotesk';font-size:12px;letter-spacing:.2em;color:var(--verd);border:1px solid rgba(61,220,151,.4);padding:6px 10px;border-radius:2px;display:inline-block;margin-bottom:14px}
 .err{color:var(--red);font-family:'Space Grotesk'}.foot{margin-top:26px;font-size:14px;color:var(--mut);font-style:italic}a{color:var(--gold)}
 </style></head><body><div class="wrap">
-  <div class="eye">STYX · The Seal · read-only statement</div>
+  <div class="eye">LETHE · The Seal · read-only statement</div>
   <h1>What the key holder <em>sees.</em></h1>
   <div class="sub">This page was opened with a view key. It can read this wallet's shielded balance and history. It can never spend.</div>
   <div id="out" class="card">reading the seal…</div>
-  <div class="foot">Selective disclosure: the wallet owner generated this key on <a href="/">styxonarc.xyz</a> and chose who to give it to. Nobody without it can see any of this. <b>Balances shown are ledger balances at the time of reading.</b></div>
+  <div class="foot">Selective disclosure: the wallet owner generated this key on <a href="/">letheonarc.xyz</a> and chose who to give it to. Nobody without it can see any of this. <b>Balances shown are ledger balances at the time of reading.</b></div>
 </div>
 <script>
 const $ = (s) => document.querySelector(s); const fmt = (n) => (+n).toLocaleString('en-US', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
@@ -32,11 +32,11 @@ const $ = (s) => document.querySelector(s); const fmt = (n) => (+n).toLocaleStri
   const key = (location.hash || '').replace(/^#/, '').trim(); if (!key) { $('#out').innerHTML = '<span class="err">no view key in the link</span>'; return; }
   const r = await fetch('/api/view', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ key }) }).then((x) => x.json());
   if (r.error) { $('#out').innerHTML = '<span class="err">' + r.error + '</span>'; return; }
-  const rows = (r.hist || []).map((h) => `<tr><td><span class="ty ${h.type}">${h.type}</span></td><td>${new Date(h.ts).toISOString().replace('T', ' ').slice(0, 16)} UTC</td><td>${h.memo ? h.memo : h.to ? h.to.slice(0, 6) + '…' + h.to.slice(-4) : h.id ? 'note ' + h.id.slice(0, 8) + '…' : ''}</td><td class="am">${fmt(h.amt)} sUSD</td></tr>`).join('') || '<tr><td colspan="4" style="color:var(--mut)">no shielded activity yet</td></tr>';
+  const rows = (r.hist || []).map((h) => `<tr><td><span class="ty ${h.type}">${h.type}</span></td><td>${new Date(h.ts).toISOString().replace('T', ' ').slice(0, 16)} UTC</td><td>${h.memo ? h.memo : h.to ? h.to.slice(0, 6) + '…' + h.to.slice(-4) : h.id ? 'note ' + h.id.slice(0, 8) + '…' : ''}</td><td class="am">${fmt(h.amt)} lUSD</td></tr>`).join('') || '<tr><td colspan="4" style="color:var(--mut)">no shielded activity yet</td></tr>';
   $('#out').innerHTML = `<div class="seal">✓ SEAL VERIFIED · HMAC-SHA256</div>
     <div class="kv"><span>wallet</span><b>${r.wallet}</b></div>
-    <div class="kv"><span>shielded balance</span><b class="big">${fmt(r.priv)} sUSD</b></div>
-    <div class="kv"><span>keeping vigil</span><b>${fmt(r.staked)} sUSD</b></div>
+    <div class="kv"><span>shielded balance</span><b class="big">${fmt(r.priv)} lUSD</b></div>
+    <div class="kv"><span>keeping vigil</span><b>${fmt(r.staked)} lUSD</b></div>
     <div class="kv"><span>ledger merkle root</span><b>${r.root}</b></div>
     <div class="kv"><span>read at</span><b>${new Date(r.t).toISOString()}</b></div>
     <h3 style="font-family:Space Grotesk;font-size:13px;letter-spacing:.2em;color:var(--gold);margin:22px 0 8px">SHIELDED HISTORY</h3>

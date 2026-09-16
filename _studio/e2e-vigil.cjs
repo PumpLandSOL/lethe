@@ -7,7 +7,7 @@ const ok = (name, cond, extra) => console.log((cond ? 'PASS ' : 'FAIL ') + name 
   const m = await (await fetch(B + '/api/metrics')).json();
   ok('metrics has chain/vigil/deposits/queue', m.chain && m.vigil && m.deposits && m.queue, `chain.ok=${m.chain.ok} block=${m.chain.block} treasuryUsdg=${m.chain.treasuryUsdg} vigil.live=${m.vigil.live} apy=${m.vigil.apy}`);
   const acc = await post('/api/account', {});
-  ok('fresh wallet has ZERO seeded USDG', acc.usdg === 0 && acc.styx === 0, JSON.stringify({ usdg: acc.usdg, styx: acc.styx }));
+  ok('fresh wallet has ZERO seeded USDG', acc.usdg === 0 && acc.lethe === 0, JSON.stringify({ usdg: acc.usdg, lethe: acc.lethe }));
   const mint = await post('/api/mint', { amount: 100 });
   ok('mint refused with no deposit', !!mint.error, mint.error);
   const dep1 = await post('/api/deposit', { tx: 'nope' });
@@ -17,7 +17,7 @@ const ok = (name, cond, extra) => console.log((cond ? 'PASS ' : 'FAIL ') + name 
   const wd = await post('/api/withdraw', { amount: 5 });
   ok('withdraw refused with no balance', !!wd.error, wd.error);
   const st = await post('/api/stake', { amount: 10 });
-  ok('stake refused (no sUSD or vigil closed)', !!st.error, st.error);
+  ok('stake refused (no lUSD or vigil closed)', !!st.error, st.error);
   const adm = await post('/api/admin/paid', { key: 'x', id: 'y' });
   ok('admin endpoint locked', adm.error === 'no');
   // simulate a credited deposit by poking the ledger through the same code path is impossible without a real tx — sanity-check math instead

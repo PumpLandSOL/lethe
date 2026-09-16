@@ -8,8 +8,8 @@ function toast(m, err) { const t = $('toast'); t.textContent = m; t.className = 
 
 let M = null, A = null, tab = 'mint', reveal = false;
 const dur = (ms) => { const d = Math.floor(ms / 864e5), hh = Math.floor(ms % 864e5 / 36e5), mm = Math.floor(ms % 36e5 / 6e4); return d > 0 ? d + 'd ' + hh + 'h' : hh + 'h ' + mm + 'm'; };
-let wallet = localStorage.getItem('styx_w') || '';
-let refParam = ''; try { const q = new URLSearchParams(location.search); if (/^0x[a-fA-F0-9]{40}$/.test(q.get('ref') || '')) { refParam = q.get('ref').toLowerCase(); localStorage.setItem('styx_ref', refParam); } else refParam = localStorage.getItem('styx_ref') || ''; } catch (e) {}
+let wallet = localStorage.getItem('lethe_w') || '';
+let refParam = ''; try { const q = new URLSearchParams(location.search); if (/^0x[a-fA-F0-9]{40}$/.test(q.get('ref') || '')) { refParam = q.get('ref').toLowerCase(); localStorage.setItem('lethe_ref', refParam); } else refParam = localStorage.getItem('lethe_ref') || ''; } catch (e) {}
 
 function setConnected() { const b = $('connect'); b.textContent = wallet ? wallet.slice(0, 4) + '…' + wallet.slice(-4) : 'Connect'; }
 const CHAIN_HEX = '0x13b2';   // Arc mainnet 5042
@@ -23,18 +23,18 @@ async function connectPhantom() {                                // EVM wallet o
     if (!acc || !acc.length) throw new Error('no account');
     await ensureChain(eth);
     const pk = acc[0].toLowerCase();
-    wallet = pk; localStorage.setItem('styx_w', pk); setConnected(); toast('wallet connected · Arc'); await loadAccount();
+    wallet = pk; localStorage.setItem('lethe_w', pk); setConnected(); toast('wallet connected · Arc'); await loadAccount();
   } catch (e) { toast('connection cancelled', true); }
 }
-if (window.ethereum && window.ethereum.on) window.ethereum.on('accountsChanged', (acc) => { if (acc && acc.length) { wallet = acc[0].toLowerCase(); localStorage.setItem('styx_w', wallet); setConnected(); loadAccount(); } });
+if (window.ethereum && window.ethereum.on) window.ethereum.on('accountsChanged', (acc) => { if (acc && acc.length) { wallet = acc[0].toLowerCase(); localStorage.setItem('lethe_w', wallet); setConnected(); loadAccount(); } });
 $('connect').onclick = async () => {
   if (wallet) {                                                   // already connected -> disconnect
-    wallet = ''; localStorage.removeItem('styx_w'); A = null; setConnected(); renderAccount(); toast('disconnected'); return;
+    wallet = ''; localStorage.removeItem('lethe_w'); A = null; setConnected(); renderAccount(); toast('disconnected'); return;
   }
   await connectPhantom();
 };
 $('wmodal').onclick = (e) => { if (e.target.id === 'wmodal') $('wmodal').classList.remove('on'); };
-$('wsave').onclick = async () => { const v = $('waddr').value.trim(); if (!/^0x[a-fA-F0-9]{40}$/.test(v)) return toast('invalid address', true); wallet = v.toLowerCase(); localStorage.setItem('styx_w', v); setConnected(); $('wmodal').classList.remove('on'); toast('file opened'); await loadAccount(); };
+$('wsave').onclick = async () => { const v = $('waddr').value.trim(); if (!/^0x[a-fA-F0-9]{40}$/.test(v)) return toast('invalid address', true); wallet = v.toLowerCase(); localStorage.setItem('lethe_w', v); setConnected(); $('wmodal').classList.remove('on'); toast('file opened'); await loadAccount(); };
 function needWallet() { if (!wallet) { connectPhantom(); return true; } return false; }
 $('cta-demo').onclick = () => $('demo').scrollIntoView({ behavior: 'smooth' });
 
@@ -42,11 +42,11 @@ $('cta-demo').onclick = () => $('demo').scrollIntoView({ behavior: 'smooth' });
 async function loadMetrics() { M = await api('/api/metrics'); renderMetrics(); }
 function renderMetrics() {
   if (!M) return;
-  const pegEl = $('s-peg'); pegEl.textContent = '$' + fmt(M.susdPrice, 4); pegEl.className = 'v peg ' + M.pegStatus;
+  const pegEl = $('s-peg'); pegEl.textContent = '$' + fmt(M.lusdPrice, 4); pegEl.className = 'v peg ' + M.pegStatus;
   $('s-cr').textContent = fmt(M.cr * 100, 1) + '%';
   $('s-col').textContent = '$' + big(M.collateralUsd);
-  $('s-sup').textContent = big(M.susdSupply) + ' sUSD';
-  $('s-shd').textContent = big(M.shielded.totalValue) + ' sUSD';
+  $('s-sup').textContent = big(M.lusdSupply) + ' lUSD';
+  $('s-shd').textContent = big(M.shielded.totalValue) + ' lUSD';
   if (M.mint) { $('cabar').style.display = 'flex'; $('ca-mint').textContent = M.mint; }
   
   if (M.dark) { const D = M.dark;
@@ -54,24 +54,24 @@ function renderMetrics() {
     $('dk-open').textContent = fmt(D.open, 0); $('dk-vol').textContent = '$' + big(D.volume); $('dk-fees').textContent = '$' + fmt(D.fees, 2);
   }
   if (M.bonds) { const Bd = M.bonds;
-    $('bd-price').textContent = '$' + fmt(Bd.price, 6); $('bd-market').textContent = '$' + fmt(Bd.market, 6); $('bd-left').textContent = '$' + fmt(Bd.leftToday, 0) + ' / $' + fmt(Bd.capUsd, 0); $('bd-sold').textContent = '$' + fmt(Bd.soldUsd, 0) + ' · ' + big(Bd.soldStyx) + ' STYX'; if (Bd.forge) { $('fg-price').textContent = '$' + fmt(Bd.forge.price, 6) + ' (−' + fmt(Bd.forge.discount * 100, 0) + '%)'; $('fg-locked').textContent = big(Bd.forge.lockedStyx) + ' STYX · ' + Bd.forge.n + ' forged'; }
+    $('bd-price').textContent = '$' + fmt(Bd.price, 6); $('bd-market').textContent = '$' + fmt(Bd.market, 6); $('bd-left').textContent = '$' + fmt(Bd.leftToday, 0) + ' / $' + fmt(Bd.capUsd, 0); $('bd-sold').textContent = '$' + fmt(Bd.soldUsd, 0) + ' · ' + big(Bd.soldLethe) + ' LETHE'; if (Bd.forge) { $('fg-price').textContent = '$' + fmt(Bd.forge.price, 6) + ' (−' + fmt(Bd.forge.discount * 100, 0) + '%)'; $('fg-locked').textContent = big(Bd.forge.lockedLethe) + ' LETHE · ' + Bd.forge.n + ' forged'; }
   }
   if (M.vigil) { const V = M.vigil;
     $('v-apy').textContent = fmt(V.apy * 100, 0) + '%'; $('v-boost').textContent = V.boost && V.boost.live ? '⚡ boosted from ' + fmt(V.baseApy * 100, 0) + '% · ' + dur(V.boost.endsIn) + ' left' : ''; $('v-staked').textContent = big(V.staked) + ' / ' + big(V.cap);
-    $('v-pool').textContent = big(V.poolLeft) + ' STYX'; $('v-ends').textContent = V.startsIn > 0 ? 'opens in ' + dur(V.startsIn) : V.live ? dur(V.endsIn) : 'ended'; $('v-n').textContent = fmt(V.stakers, 0);
+    $('v-pool').textContent = big(V.poolLeft) + ' LETHE'; $('v-ends').textContent = V.startsIn > 0 ? 'opens in ' + dur(V.startsIn) : V.live ? dur(V.endsIn) : 'ended'; $('v-n').textContent = fmt(V.stakers, 0);
   }
   
   if (M.ferry) { const Fm = M.ferry;
-    $('ferryboard').innerHTML = Fm.board.map((b, i) => `<div class="r"><span class="ty">#${i + 1}</span><span class="sg">${b.who}</span><span class="am">${b.souls} referred · ${fmt(b.earned, 2)} sUSD</span></div>`).join('') || '<div class="r"><span class="sg">no referrals yet — write the first Note</span></div>';
+    $('ferryboard').innerHTML = Fm.board.map((b, i) => `<div class="r"><span class="ty">#${i + 1}</span><span class="sg">${b.who}</span><span class="am">${b.souls} referred · ${fmt(b.earned, 2)} lUSD</span></div>`).join('') || '<div class="r"><span class="sg">no referrals yet — write the first Note</span></div>';
   }
   if (M.pyre) { const P = M.pyre;
-    $('p-styx').textContent = big(P.burnedStyx) + ' STYX'; $('p-usd').textContent = '$' + big(P.burnedUsd);
+    $('p-lethe').textContent = big(P.burnedLethe) + ' LETHE'; $('p-usd').textContent = '$' + big(P.burnedUsd);
     $('p-toll').textContent = '$' + fmt(P.tollUsd, 2) + ' / $' + P.minUsd; $('p-ep').textContent = fmt(P.epochs, 0);
-    $('pyrefeed').innerHTML = P.burns.map((b) => `<div class="r"><span class="ty burn">burn</span><span class="sg">epoch ${b.epoch} · ${b.id} · @ $${fmt(b.px, 6)}</span><span class="am">🔥 ${fmt(b.styx, 1)} STYX</span></div>`).join('') || '<div class="r"><span class="sg">the pyre is gathering its first toll…</span></div>';
+    $('pyrefeed').innerHTML = P.burns.map((b) => `<div class="r"><span class="ty burn">burn</span><span class="sg">epoch ${b.epoch} · ${b.id} · @ $${fmt(b.px, 6)}</span><span class="am">🔥 ${fmt(b.lethe, 1)} LETHE</span></div>`).join('') || '<div class="r"><span class="sg">the pyre is gathering its first toll…</span></div>';
   }
   $('feed').innerHTML = (M.feed.length ? M.feed : []).map((t) => {
     const right = t.type === 'private' ? '<span class="redact">█████</span>'
-      : t.publicAmount != null ? fmt(t.publicAmount, 0) + ' sUSD' : '<span class="redact">████</span>';
+      : t.publicAmount != null ? fmt(t.publicAmount, 0) + ' lUSD' : '<span class="redact">████</span>';
     const ty = t.type === 'private' ? 'private' : t.type;
     return `<div class="r"><span class="ty ${t.type}">${ty}</span><span class="sg">${t.sig}</span><span class="am">${right}</span></div>`;
   }).join('') || '<div class="r"><span class="sg">no entries yet</span></div>';
@@ -81,10 +81,10 @@ function renderMetrics() {
 async function loadAccount() { if (!wallet) { A = null; renderAccount(); return; } A = await api('/api/account', { wallet, ref: refParam || undefined }); if (A.error) { toast(A.error, true); A = null; } renderAccount(); }
 function renderAccount() {
   if (wallet) { $('ferrybox').style.display = 'flex'; $('ferrylink').textContent = location.origin + '/?ref=' + wallet; } else $('ferrybox').style.display = 'none';
-  $('f-souls').textContent = A ? fmt(A.souls, 0) : '—'; $('f-earned').textContent = A ? fmt(A.earned, 2) + ' sUSD' : '—';
+  $('f-souls').textContent = A ? fmt(A.souls, 0) : '—'; $('f-earned').textContent = A ? fmt(A.earned, 2) + ' lUSD' : '—';
   $('b-usdg').textContent = A ? fmt(A.usdg, 0) : '—';
-  $('b-styx').textContent = A ? fmt(A.styx, 1) : '—';
-  $('b-susd').textContent = A ? fmt(A.susd, 2) : '—';
+  $('b-lethe').textContent = A ? fmt(A.lethe, 1) : '—';
+  $('b-lusd').textContent = A ? fmt(A.lusd, 2) : '—';
   renderPriv();
   renderPanel();
 }
@@ -100,7 +100,7 @@ let sealKey = '', claimSecret = '', lastNote = null;
 // ---------- demo tabs ----------
 document.querySelectorAll('.tabs button').forEach((b) => b.onclick = () => { tab = b.dataset.tab; document.querySelectorAll('.tabs button').forEach((x) => x.classList.toggle('on', x === b)); renderPanel(); });
 function renderPanel() {
-  const p = $('panel'); const cr = M ? M.cr : 0.9, vp = M ? M.styxPrice : 0.85;
+  const p = $('panel'); const cr = M ? M.cr : 0.9, vp = M ? M.lethePrice : 0.85;
   if (tab === 'seal') {
     const url = location.origin + '/view#' + sealKey;
     p.innerHTML = `<div class="note"><b>The Seal.</b> This view key opens a read-only statement of your shielded balance and history. It <b>cannot spend</b>. Give it only to who you want to see.</div>
@@ -108,44 +108,44 @@ function renderPanel() {
       <div class="kv" style="margin-top:12px"><span>opens</span><b><a href="${url}" target="_blank" style="color:var(--gold)">sealed statement ↗</a></b></div>`;
     $('cp').onclick = () => { navigator.clipboard.writeText(url); toast('view key copied'); };
   } else if (tab === 'claim') {
-    p.innerHTML = `<div class="note"><b>Someone sent you a Note.</b> Private sUSD is locked behind this link. Claim it into your shielded balance.</div>
+    p.innerHTML = `<div class="note"><b>Someone sent you a Note.</b> Private lUSD is locked behind this link. Claim it into your shielded balance.</div>
       <div class="kv"><span>amount</span><b id="cl-amt">…</b></div><div class="kv"><span>memo</span><b id="cl-memo">—</b></div>
       <button class="btn wide" id="act" style="margin-top:14px">Claim into my shielded balance</button>`;
-    api('/api/note/peek', { secret: claimSecret }).then((r) => { if (r.error) { $('cl-amt').textContent = r.error; $('act').disabled = true; return; } $('cl-amt').textContent = r.claimed ? 'already claimed' : fmt(r.amt, 2) + ' sUSD'; $('cl-memo').textContent = r.memo || '—'; if (r.claimed) $('act').disabled = true; });
-    $('act').onclick = () => doAct('/api/note/claim', { secret: claimSecret, amount: 1 }, (r) => { history.replaceState(null, '', location.pathname); tab = 'send'; renderPanel(); return `claimed ${fmt(r.claimed, 2)} sUSD — privately`; });
+    api('/api/note/peek', { secret: claimSecret }).then((r) => { if (r.error) { $('cl-amt').textContent = r.error; $('act').disabled = true; return; } $('cl-amt').textContent = r.claimed ? 'already claimed' : fmt(r.amt, 2) + ' lUSD'; $('cl-memo').textContent = r.memo || '—'; if (r.claimed) $('act').disabled = true; });
+    $('act').onclick = () => doAct('/api/note/claim', { secret: claimSecret, amount: 1 }, (r) => { history.replaceState(null, '', location.pathname); tab = 'send'; renderPanel(); return `claimed ${fmt(r.claimed, 2)} lUSD — privately`; });
   } else if (tab === 'dark') {
     const D = M && M.dark, pos = (A && A.dark) || [];
-    p.innerHTML = `<div class="note"><b>The Dark Pool.</b> Commit shielded sUSD to a stock. Long or short, 1x, live tape. Ticker, size and P&amp;L stay in the shield. 30 bps each way.</div>
+    p.innerHTML = `<div class="note"><b>The Dark Pool.</b> Commit shielded lUSD to a stock. Long or short, 1x, live tape. Ticker, size and P&amp;L stay in the shield. 30 bps each way.</div>
       <div style="display:flex;gap:10px"><div class="field" style="flex:1"><select id="sym" style="flex:1;background:none;border:none;color:var(--ink);font-family:'JetBrains Mono';font-size:15px;outline:none">${(D ? D.markets : []).map((m) => `<option value="${m.sym}" ${m.fresh ? '' : 'disabled'}>${m.sym} ${m.px ? '· $' + fmt(m.px, 2) : ''}${m.fresh ? '' : ' · closed'}</option>`).join('')}</select></div>
       <div class="field" style="flex:0 0 150px"><select id="side" style="flex:1;background:none;border:none;color:var(--ink);font-family:'JetBrains Mono';font-size:15px;outline:none"><option value="long">LONG</option><option value="short">SHORT</option></select></div></div>
-      <div class="field"><input id="in" type="number" placeholder="10.00 minimum" min="10"><span class="u">sUSD</span><span class="mx" id="mx">MAX</span></div>
+      <div class="field"><input id="in" type="number" placeholder="10.00 minimum" min="10"><span class="u">lUSD</span><span class="mx" id="mx">MAX</span></div>
       <div class="kv"><span>Shielded balance</span><b>${A ? (reveal ? fmt(A.priv, 2) : '████') : '—'}</b></div><div class="kv"><span>Per position · pool</span><b>${D ? 'max ' + fmt(D.maxPos, 0) + ' · ' + (D.full ? 'full' : 'open') : '—'}</b></div>
       <button class="btn fill wide" id="act" style="margin-top:14px">Open unseen</button>
       ${pos.length ? '<div style="margin-top:16px">' + pos.map((q) => `<div class="pos"><b>${q.sym}</b><span>${q.side}</span><span class="sg" style="font-family:'JetBrains Mono';font-size:12px;color:var(--mut)">${fmt(q.notional, 2)} @ ${fmt(q.entry, 2)} → ${fmt(q.px, 2)}</span><span class="pnl ${q.pnl >= 0 ? 'up' : 'dn'}">${q.pnl >= 0 ? '+' : ''}${fmt(q.pnl, 2)}</span><button data-close="${q.id}" ${q.fresh ? '' : 'disabled'}>Close</button></div>`).join('') + '</div>' : ''}`;
     $('mx').onclick = () => { if (A) $('in').value = Math.min(A.priv, D ? D.maxPos : 1000); };
     $('act').onclick = () => doAct('/api/dark/open', { sym: $('sym').value, side: $('side').value, amount: +$('in').value }, (r) => `opened ${r.opened.side} ${r.opened.sym} — unseen`);
-    p.querySelectorAll('[data-close]').forEach((b) => b.onclick = () => doAct('/api/dark/close', { id: b.dataset.close, amount: 1 }, (r) => `closed · ${r.closed.pnl >= 0 ? '+' : ''}${fmt(r.closed.pnl, 2)} sUSD`));
+    p.querySelectorAll('[data-close]').forEach((b) => b.onclick = () => doAct('/api/dark/close', { id: b.dataset.close, amount: 1 }, (r) => `closed · ${r.closed.pnl >= 0 ? '+' : ''}${fmt(r.closed.pnl, 2)} lUSD`));
   } else if (tab === 'bond') {
     const Bd = M && M.bonds, me = A && A.bonds;
     const F = Bd && Bd.forge; if (typeof window.__lock === 'undefined') window.__lock = true; const L = window.__lock;
-    p.innerHTML = `<div class="note"><b>Bond USDC for $STYX at ${Bd ? fmt(Bd.discount * 100, 0) : 20}% below market.</b> Vests over ${Bd ? Bd.vestDays : 5} days. Your USDC goes to the reserve and mints nothing. ${Bd && !Bd.open ? '<b>Bonds are closed.</b>' : ''}</div>
+    p.innerHTML = `<div class="note"><b>Bond USDC for $LETHE at ${Bd ? fmt(Bd.discount * 100, 0) : 20}% below market.</b> Vests over ${Bd ? Bd.vestDays : 5} days. Your USDC goes to the reserve and mints nothing. ${Bd && !Bd.open ? '<b>Bonds are closed.</b>' : ''}</div>
       <div style="display:flex;gap:8px;margin:0 0 12px"><button class="btn ${L ? 'fill' : 'ghost'}" id="lk1" style="flex:1.3">🔥 THE FORGE · lock ${F ? F.lockDays * 24 : 48}h · −${F ? fmt(F.discount * 100, 0) : 30}% · ${F ? fmt(F.apy * 100, 0) : 80}% APY</button><button class="btn ${L ? 'ghost' : 'fill'}" id="lk0" style="flex:1">Plain bond · −${Bd ? fmt(Bd.discount * 100, 0) : 20}% · ${Bd ? Bd.vestDays : 5}d vest</button></div>
-      ${L ? `<div class="note" style="border-color:var(--gold)"><b>The Forge:</b> your USDC enters the bond pool, you take $STYX at <b>${F ? fmt(F.discount * 100, 0) : 30}% below market</b>, locked <b>${F ? F.lockDays * 24 : 48} hours</b>. While locked it earns <b>${F ? fmt(F.apy * 100, 0) : 80}% APY in $STYX</b>, paid from the Vigil's fixed pool. Nothing printed. Claim principal + yield at unlock.</div>` : ''}
+      ${L ? `<div class="note" style="border-color:var(--gold)"><b>The Forge:</b> your USDC enters the bond pool, you take $LETHE at <b>${F ? fmt(F.discount * 100, 0) : 30}% below market</b>, locked <b>${F ? F.lockDays * 24 : 48} hours</b>. While locked it earns <b>${F ? fmt(F.apy * 100, 0) : 80}% APY in $LETHE</b>, paid from the Vigil's fixed pool. Nothing printed. Claim principal + yield at unlock.</div>` : ''}
       <div class="field"><input id="in" type="number" placeholder="50.00 minimum" min="50"><span class="u">USDC</span><span class="mx" id="mx">MAX</span></div>
       <div class="kv"><span>USDC on ledger</span><b>${A ? fmt(A.usdg, 2) : '—'}</b></div>
       <div class="kv"><span>${L ? 'forge' : 'bond'} price · market</span><b>${Bd ? '$' + fmt(L && F ? F.price : Bd.price, 6) + ' · $' + fmt(Bd.market, 6) : '—'}</b></div>
       <div class="kv"><span>you receive</span><b id="o1">—</b></div>
       ${L ? '<div class="kv"><span>yield at unlock</span><b id="o2">—</b></div>' : ''}
-      <div class="kv"><span>vesting · claimable now</span><b>${me ? big(me.pending) + ' · ' + big(me.claimable) + ' STYX' : '—'}</b></div>
-      ${me && me.locked ? `<div class="kv"><span>in the forge · yield forging</span><b style="color:var(--gold2)">${big(me.locked)} · +${big(me.forging)} STYX</b></div>` : ''}
-      <div style="display:flex;gap:10px;margin-top:14px"><button class="btn fill" id="act" style="flex:1.4">${L ? '🔥 Forge STYX' : 'Bond USDC'}</button><button class="btn ghost" id="act2" style="flex:1">Claim vested</button><button class="btn ghost" id="act3" style="flex:1">Withdraw STYX</button></div>
+      <div class="kv"><span>vesting · claimable now</span><b>${me ? big(me.pending) + ' · ' + big(me.claimable) + ' LETHE' : '—'}</b></div>
+      ${me && me.locked ? `<div class="kv"><span>in the forge · yield forging</span><b style="color:var(--gold2)">${big(me.locked)} · +${big(me.forging)} LETHE</b></div>` : ''}
+      <div style="display:flex;gap:10px;margin-top:14px"><button class="btn fill" id="act" style="flex:1.4">${L ? '🔥 Forge LETHE' : 'Bond USDC'}</button><button class="btn ghost" id="act2" style="flex:1">Claim vested</button><button class="btn ghost" id="act3" style="flex:1">Withdraw LETHE</button></div>
       <div class="note" style="margin-top:12px;margin-bottom:0">No USDC yet? <a href="#" id="go-dep" style="color:var(--gold)">Deposit first →</a></div>`;
     $('mx').onclick = () => { if (A) $('in').value = A.usdg; };
-    $('in').oninput = () => { const x = +$('in').value || 0; const px = L && F ? F.price : (Bd && Bd.price); $('o1').textContent = Bd ? big(x / px) + ' STYX (' + big(x / Bd.market) + ' at market)' : '—'; if (L && F && $('o2')) $('o2').textContent = '+' + big(x / px * F.apy * F.lockDays / 365) + ' STYX (' + fmt(F.apy * 100, 0) + '% APY × ' + F.lockDays * 24 + 'h)'; };
+    $('in').oninput = () => { const x = +$('in').value || 0; const px = L && F ? F.price : (Bd && Bd.price); $('o1').textContent = Bd ? big(x / px) + ' LETHE (' + big(x / Bd.market) + ' at market)' : '—'; if (L && F && $('o2')) $('o2').textContent = '+' + big(x / px * F.apy * F.lockDays / 365) + ' LETHE (' + fmt(F.apy * 100, 0) + '% APY × ' + F.lockDays * 24 + 'h)'; };
     $('lk1').onclick = () => { window.__lock = true; renderPanel(); }; $('lk0').onclick = () => { window.__lock = false; renderPanel(); };
-    $('act').onclick = () => doAct('/api/bond', { amount: +$('in').value, lock: L }, (r) => r.lock ? `forged ${fmt(r.bonded, 2)} USDC → ${big(r.styxOut)} STYX locked ${F.lockDays * 24}h at ${fmt(r.apy * 100, 0)}% APY` : `bonded ${fmt(r.bonded, 2)} USDC → ${big(r.styxOut)} STYX vesting`);
-    $('act2').onclick = () => doAct('/api/bond/claim', { amount: 1 }, (r) => `claimed ${big(r.claimedStyx)} STYX${r.forgedStyx > 0 ? ' (incl. ' + big(r.forgedStyx) + ' forged yield)' : ''}`);
-    $('act3').onclick = () => doAct('/api/withdraw', { asset: 'STYX', amount: A ? A.styx : 0 }, (r) => `queued ${big(r.queued.amt)} STYX for payout`);
+    $('act').onclick = () => doAct('/api/bond', { amount: +$('in').value, lock: L }, (r) => r.lock ? `forged ${fmt(r.bonded, 2)} USDC → ${big(r.letheOut)} LETHE locked ${F.lockDays * 24}h at ${fmt(r.apy * 100, 0)}% APY` : `bonded ${fmt(r.bonded, 2)} USDC → ${big(r.letheOut)} LETHE vesting`);
+    $('act2').onclick = () => doAct('/api/bond/claim', { amount: 1 }, (r) => `claimed ${big(r.claimedLethe)} LETHE${r.forgedLethe > 0 ? ' (incl. ' + big(r.forgedLethe) + ' forged yield)' : ''}`);
+    $('act3').onclick = () => doAct('/api/withdraw', { asset: 'LETHE', amount: A ? A.lethe : 0 }, (r) => `queued ${big(r.queued.amt)} LETHE for payout`);
     $('go-dep').onclick = (e) => { e.preventDefault(); tab = 'deposit'; document.querySelectorAll('.tabs button').forEach((x) => x.classList.toggle('on', x.dataset.tab === 'deposit')); renderPanel(); };
   } else if (tab === 'deposit') {
     p.innerHTML = `<div class="note">Send <b>USDC on Arc</b> to the treasury and it is credited to your ledger once the receipt confirms. <b>Every deposited dollar sits in the treasury address</b> — see the on-chain balance in the Treasury bar below.</div>
@@ -160,34 +160,34 @@ function renderPanel() {
     $('act2').onclick = () => doAct('/api/deposit', { tx: ($('tx').value || '').trim(), amount: 1 }, (r) => `credited ${fmt(r.amt, 2)} USDC from the treasury deposit`);
   } else if (tab === 'vigil') {
     const V = M && M.vigil, me = A && A.vigil;
-    p.innerHTML = `<div class="note">Stake public sUSD in <b>The Vigil</b>: <b>${V ? fmt(V.apy * 100, 0) : '—'}% APY</b> for 30 days, paid in <b>$STYX</b> from a pre-funded pool. Unstake any time (30 bps toll). ${V && !V.live ? '<b>The vigil is ' + (V.startsIn > 0 ? 'not open yet' : 'over') + '.</b>' : ''}</div>
-      <div class="field"><input id="in" type="number" placeholder="0.00" min="0"><span class="u">sUSD</span><span class="mx" id="mx">MAX</span></div>
-      <div class="kv"><span>Public sUSD</span><b>${A ? fmt(A.susd, 2) : '—'}</b></div>
-      <div class="kv"><span>Keeping vigil</span><b>${me ? fmt(me.staked, 2) + ' sUSD' : '—'}</b></div>
-      <div class="kv"><span>Earned · claimable</span><b>${me ? fmt(me.accruedStyx, 1) + ' STYX (≈ $' + fmt(me.accruedUsd, 4) + ')' : '—'}</b></div>
-      <div style="display:flex;gap:10px;margin-top:14px"><button class="btn" id="act" style="flex:1">Stake</button><button class="btn ghost" id="act2" style="flex:1">Unstake</button><button class="btn ghost" id="act3" style="flex:1">Claim STYX</button></div>`;
-    $('mx').onclick = () => { if (A) $('in').value = A.susd; };
-    $('act').onclick = () => doAct('/api/stake', { amount: +$('in').value }, (r) => `${fmt(r.staked, 2)} sUSD keeps vigil`);
-    $('act2').onclick = () => doAct('/api/unstake', { amount: +$('in').value }, (r) => `unstaked ${fmt(r.unstaked, 2)} sUSD`);
-    $('act3').onclick = () => doAct('/api/claim', { amount: 1 }, (r) => `claimed ${fmt(r.claimedStyx, 1)} STYX`);
+    p.innerHTML = `<div class="note">Stake public lUSD in <b>The Vigil</b>: <b>${V ? fmt(V.apy * 100, 0) : '—'}% APY</b> for 30 days, paid in <b>$LETHE</b> from a pre-funded pool. Unstake any time (30 bps toll). ${V && !V.live ? '<b>The vigil is ' + (V.startsIn > 0 ? 'not open yet' : 'over') + '.</b>' : ''}</div>
+      <div class="field"><input id="in" type="number" placeholder="0.00" min="0"><span class="u">lUSD</span><span class="mx" id="mx">MAX</span></div>
+      <div class="kv"><span>Public lUSD</span><b>${A ? fmt(A.lusd, 2) : '—'}</b></div>
+      <div class="kv"><span>Keeping vigil</span><b>${me ? fmt(me.staked, 2) + ' lUSD' : '—'}</b></div>
+      <div class="kv"><span>Earned · claimable</span><b>${me ? fmt(me.accruedLethe, 1) + ' LETHE (≈ $' + fmt(me.accruedUsd, 4) + ')' : '—'}</b></div>
+      <div style="display:flex;gap:10px;margin-top:14px"><button class="btn" id="act" style="flex:1">Stake</button><button class="btn ghost" id="act2" style="flex:1">Unstake</button><button class="btn ghost" id="act3" style="flex:1">Claim LETHE</button></div>`;
+    $('mx').onclick = () => { if (A) $('in').value = A.lusd; };
+    $('act').onclick = () => doAct('/api/stake', { amount: +$('in').value }, (r) => `${fmt(r.staked, 2)} lUSD keeps vigil`);
+    $('act2').onclick = () => doAct('/api/unstake', { amount: +$('in').value }, (r) => `unstaked ${fmt(r.unstaked, 2)} lUSD`);
+    $('act3').onclick = () => doAct('/api/claim', { amount: 1 }, (r) => `claimed ${fmt(r.claimedLethe, 1)} LETHE`);
   } else if (tab === 'mint') {
-    p.innerHTML = `<div class="note">Mint $1-pegged <b>sUSD</b> with deposited USDC: <b>${fmt(cr * 100, 0)}% goes to collateral</b>, the <b>${fmt((1 - cr) * 100, 0)}% algorithmic share buys STYX at market and burns it</b>. Nothing is printed.</div>
-      <div class="field"><input id="in" type="number" placeholder="0.00" min="0"><span class="u">sUSD</span></div>
-      <div class="kv"><span>USDC collateral (${fmt(cr * 100, 0)}%)</span><b id="o1">—</b></div><div class="kv"><span>USDC → buys &amp; burns STYX (${fmt((1 - cr) * 100, 0)}%)</span><b id="o2">—</b></div>
-      <button class="btn wide" id="act" style="margin-top:14px">Mint sUSD</button>`;
-    $('in').oninput = () => { const m = +$('in').value || 0; $('o1').textContent = fmt(m * cr, 2) + ' USDC'; $('o2').textContent = fmt(m * (1 - cr), 2) + ' USDC ≈ ' + fmt((m * (1 - cr)) / vp, 0) + ' STYX'; };
-    $('act').onclick = () => doAct('/api/mint', { amount: +$('in').value }, (r) => `minted ${fmt(r.minted, 0)} sUSD`);
+    p.innerHTML = `<div class="note">Mint $1-pegged <b>lUSD</b> with deposited USDC: <b>${fmt(cr * 100, 0)}% goes to collateral</b>, the <b>${fmt((1 - cr) * 100, 0)}% algorithmic share buys LETHE at market and burns it</b>. Nothing is printed.</div>
+      <div class="field"><input id="in" type="number" placeholder="0.00" min="0"><span class="u">lUSD</span></div>
+      <div class="kv"><span>USDC collateral (${fmt(cr * 100, 0)}%)</span><b id="o1">—</b></div><div class="kv"><span>USDC → buys &amp; burns LETHE (${fmt((1 - cr) * 100, 0)}%)</span><b id="o2">—</b></div>
+      <button class="btn wide" id="act" style="margin-top:14px">Mint lUSD</button>`;
+    $('in').oninput = () => { const m = +$('in').value || 0; $('o1').textContent = fmt(m * cr, 2) + ' USDC'; $('o2').textContent = fmt(m * (1 - cr), 2) + ' USDC ≈ ' + fmt((m * (1 - cr)) / vp, 0) + ' LETHE'; };
+    $('act').onclick = () => doAct('/api/mint', { amount: +$('in').value }, (r) => `minted ${fmt(r.minted, 0)} lUSD`);
   } else if (tab === 'shield') {
-    p.innerHTML = `<div class="note">Move public sUSD into the <b>shielded pool</b>. It becomes a note <b>encrypted only to you</b> — your balance reads <span class="redact">████</span> on-chain.</div>
-      <div class="field"><input id="in" type="number" placeholder="0.00" min="0"><span class="u">sUSD</span><span class="mx" id="mx">MAX</span></div>
-      <div class="kv"><span>Public sUSD available</span><b>${A ? fmt(A.susd, 2) : '—'}</b></div>
-      <button class="btn wide" id="act" style="margin-top:14px">Shield sUSD</button>`;
-    $('mx').onclick = () => { if (A) $('in').value = A.susd; };
-    $('act').onclick = () => doAct('/api/shield', { amount: +$('in').value }, (r) => `shielded ${fmt(r.shielded, 2)} sUSD`);
+    p.innerHTML = `<div class="note">Move public lUSD into the <b>shielded pool</b>. It becomes a note <b>encrypted only to you</b> — your balance reads <span class="redact">████</span> on-chain.</div>
+      <div class="field"><input id="in" type="number" placeholder="0.00" min="0"><span class="u">lUSD</span><span class="mx" id="mx">MAX</span></div>
+      <div class="kv"><span>Public lUSD available</span><b>${A ? fmt(A.lusd, 2) : '—'}</b></div>
+      <button class="btn wide" id="act" style="margin-top:14px">Shield lUSD</button>`;
+    $('mx').onclick = () => { if (A) $('in').value = A.lusd; };
+    $('act').onclick = () => doAct('/api/shield', { amount: +$('in').value }, (r) => `shielded ${fmt(r.shielded, 2)} lUSD`);
   } else if (tab === 'send') {
-    p.innerHTML = `<div class="note">Send shielded sUSD. The <b>amount and both parties are hidden</b> — the ledger records only a nullifier + a new commitment.</div>
+    p.innerHTML = `<div class="note">Send shielded lUSD. The <b>amount and both parties are hidden</b> — the ledger records only a nullifier + a new commitment.</div>
       <div class="field"><input id="to" placeholder="recipient Arc address…" spellcheck="false"></div>
-      <div class="field"><input id="in" type="number" placeholder="0.00" min="0"><span class="u">sUSD</span><span class="mx" id="mx">MAX</span></div>
+      <div class="field"><input id="in" type="number" placeholder="0.00" min="0"><span class="u">lUSD</span><span class="mx" id="mx">MAX</span></div>
       <div class="kv"><span>Your private balance</span><b>${A ? (reveal ? fmt(A.priv, 2) : '████') : '—'}</b></div>
       <button class="btn wide" id="act" style="margin-top:14px">Send privately</button>
       <div class="note" style="margin:18px 0 8px"><b>Or write a Note:</b> no address needed. Lock the amount above behind a link and send the link to anyone.</div>
@@ -195,19 +195,19 @@ function renderPanel() {
       <button class="btn ghost wide" id="act2">Create pay link</button>
       ${lastNote ? '<div class="linkbox"><code>' + lastNote + '</code><button id="cpn">Copy</button></div>' : ''}`;
     $('mx').onclick = () => { if (A) $('in').value = A.priv; };
-    $('act').onclick = () => doAct('/api/send', { to: ($('to').value || '').trim(), amount: +$('in').value }, (r) => `sent ${fmt(r.sent, 2)} sUSD — privately`);
-    $('act2').onclick = () => doAct('/api/note/create', { amount: +$('in').value, memo: $('memo').value }, (r) => { lastNote = location.origin + '/#claim=' + r.secret; renderPanel(); return `note written for ${fmt(r.amt, 2)} sUSD — copy the link`; });
+    $('act').onclick = () => doAct('/api/send', { to: ($('to').value || '').trim(), amount: +$('in').value }, (r) => `sent ${fmt(r.sent, 2)} lUSD — privately`);
+    $('act2').onclick = () => doAct('/api/note/create', { amount: +$('in').value, memo: $('memo').value }, (r) => { lastNote = location.origin + '/#claim=' + r.secret; renderPanel(); return `note written for ${fmt(r.amt, 2)} lUSD — copy the link`; });
     if ($('cpn')) $('cpn').onclick = () => { navigator.clipboard.writeText(lastNote); toast('link copied'); };
   } else {
-    p.innerHTML = `<div class="note">Burn sUSD to recover your <b>${fmt(cr * 100, 0)}% USDC</b> plus the <b>${fmt((1 - cr) * 100, 0)}% STYX</b> share. (Unshield private sUSD first to redeem it.)</div>
-      <div class="field"><input id="in" type="number" placeholder="0.00" min="0"><span class="u">sUSD</span><span class="mx" id="mx">MAX</span></div>
-      <div class="kv"><span>Public sUSD</span><b>${A ? fmt(A.susd, 2) : '—'}</b></div>
+    p.innerHTML = `<div class="note">Burn lUSD to recover your <b>${fmt(cr * 100, 0)}% USDC</b> plus the <b>${fmt((1 - cr) * 100, 0)}% LETHE</b> share. (Unshield private lUSD first to redeem it.)</div>
+      <div class="field"><input id="in" type="number" placeholder="0.00" min="0"><span class="u">lUSD</span><span class="mx" id="mx">MAX</span></div>
+      <div class="kv"><span>Public lUSD</span><b>${A ? fmt(A.lusd, 2) : '—'}</b></div>
       <div class="kv"><span>USDC on ledger</span><b>${A ? fmt(A.usdg, 2) : '—'}</b></div>
       <div style="display:flex;gap:10px;margin-top:14px"><button class="btn ghost" id="act2" style="flex:1">Unshield</button><button class="btn" id="act" style="flex:1">Redeem</button><button class="btn ghost" id="act3" style="flex:1">Withdraw USDC</button></div>
       ${A && A.queue && A.queue.length ? '<div class="note" style="margin-top:14px">' + A.queue.map((q) => '<div class="kv"><span>withdraw ' + fmt(q.amt, 2) + ' ' + (q.asset || 'USDC') + ' · ' + q.id + '</span><b>' + (q.status === 'paid' ? 'paid' + (q.tx ? ' · ' + q.tx.slice(0, 10) + '…' : '') : 'queued · treasury pays within 24h') + '</b></div>').join('') + '</div>' : ''}`;
-    $('mx').onclick = () => { if (A) $('in').value = A.susd; };
-    $('act').onclick = () => doAct('/api/redeem', { amount: +$('in').value }, (r) => `redeemed ${fmt(r.redeemed, 0)} sUSD`);
-    $('act2').onclick = () => doAct('/api/unshield', { amount: +$('in').value }, (r) => `unshielded ${fmt(r.unshielded, 2)} sUSD`);
+    $('mx').onclick = () => { if (A) $('in').value = A.lusd; };
+    $('act').onclick = () => doAct('/api/redeem', { amount: +$('in').value }, (r) => `redeemed ${fmt(r.redeemed, 0)} lUSD`);
+    $('act2').onclick = () => doAct('/api/unshield', { amount: +$('in').value }, (r) => `unshielded ${fmt(r.unshielded, 2)} lUSD`);
     $('act3').onclick = () => doAct('/api/withdraw', { amount: +$('in').value }, (r) => `queued ${fmt(r.queued.amt, 2)} USDC for payout`);
   }
 }

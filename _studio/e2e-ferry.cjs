@@ -12,7 +12,7 @@ const f = (n) => Math.round(n * 10000) / 10000;
   const e0 = fa.earned; const m0 = (await (await fetch(B + '/api/metrics')).json()).pyre.tollUsd;
   const un = await post('/api/unshield', { wallet: S1, amount: 40 }); // toll 0.12 → F gets 0.024
   const fb = await post('/api/account', { wallet: F }); ok('F earned 20% of S1 toll', f(fb.earned - e0) === 0.024, 'earned +' + f(fb.earned - e0) + ' (toll ' + f(un.toll) + ')');
-  ok('F sUSD credited', f(fb.susd - fa.susd) === 0.024);
+  ok('F lUSD credited', f(fb.lusd - fa.lusd) === 0.024);
   const m1 = (await (await fetch(B + '/api/metrics')).json()); ok('pyre got the other 80%', f(m1.pyre.tollUsd - m0) === 0.096 || m1.pyre.epochs > 0, 'delta ' + f(m1.pyre.tollUsd - m0));
   const s2 = await post('/api/account', { wallet: S2, ref: F }); ok('S2 bound via ?ref on first touch', s2.ref === F);
   const s2b = await post('/api/account', { wallet: S2, ref: S1 }); ok('ferryman set once, never changed', s2b.ref === F);

@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>STYX — the coin for the crossing. ████ by default.</title>
-<meta property="og:url" content="https://styxonarc.xyz/"><link rel="canonical" href="https://styxonarc.xyz/"><meta property="og:title" content="STYX — private money, carried unseen."><meta property="og:description" content="sUSD: a private, fractional-algorithmic stablecoin on Arc. Shield it and the amount and both parties vanish from the ledger."><meta property="og:image" content="https://styxonarc.xyz/brand/styx-banner.png"><meta name="twitter:card" content="summary_large_image">
+<title>LETHE — the coin the river forgets. ████ by default.</title>
+<meta property="og:url" content="https://letheonarc.xyz/"><link rel="canonical" href="https://letheonarc.xyz/"><meta property="og:title" content="LETHE — private money, carried unseen."><meta property="og:description" content="lUSD: a private, fractional-algorithmic stablecoin on Arc. Shield it and the amount and both parties vanish from the ledger."><meta property="og:image" content="https://letheonarc.xyz/brand/lethe-banner.png"><meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Space+Mono:wght@400;700" rel="stylesheet">
 <style>
-:root{--bg:#f4f8fd;--stone:#ffffff;--stone2:#e9f1fb;--ink:#1b3158;--dim:#41464c;--mut:#7a858e;--gold:#2f578c;--gold2:#e9a13f;--verd:#1f8a5a;--ox:#c9413a;--red:#c9413a;
-  --line:rgba(47,87,140,.16); --line2:rgba(47,87,140,.32)}
+:root{--bg:#05070c;--stone:#0b1220;--stone2:#111a2e;--ink:#e8f0ff;--dim:#a9b8d6;--mut:#5f6f8f;--gold:#3d8bff;--gold2:#9fd8ff;--verd:#3ddc97;--ox:#ff5c6c;--red:#ff5c6c;
+  --line:rgba(61,139,255,.16); --line2:rgba(61,139,255,.32)}
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{font-family:'DM Sans',serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;font-size:17px;line-height:1.6}
@@ -19,11 +19,11 @@ a{color:inherit;text-decoration:none}
 .gold{color:var(--gold)}.verd{color:var(--verd)}
 /* stone backdrop + vignette + faint marble veining */
 .bg{position:fixed;inset:0;z-index:-2;background:
-  radial-gradient(120% 80% at 50% -10%,rgba(47,87,140,.06),transparent 55%),
-  radial-gradient(90% 60% at 50% 120%,rgba(31,138,90,.05),transparent 60%),
-  #f4f8fd}
+  radial-gradient(120% 80% at 50% -10%,rgba(61,139,255,.06),transparent 55%),
+  radial-gradient(90% 60% at 50% 120%,rgba(61,220,151,.05),transparent 60%),
+  #05070c}
 .grain{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.05;
-  background-image:radial-gradient(rgba(27,49,88,.5) .5px,transparent .6px);background-size:3px 3px}
+  background-image:radial-gradient(rgba(232,240,255,.5) .5px,transparent .6px);background-size:3px 3px}
 .wrap{max-width:880px;margin:0 auto;padding:0 22px}
 
 /* greek-key frieze divider */
@@ -32,36 +32,36 @@ a{color:inherit;text-decoration:none}
   margin:6px 0}
 
 /* header */
-header{position:sticky;top:0;z-index:40;background:rgba(244,248,253,.92);backdrop-filter:blur(6px);border-bottom:1px solid var(--line2)}
+header{position:sticky;top:0;z-index:40;background:rgba(5,7,12,.92);backdrop-filter:blur(6px);border-bottom:1px solid var(--line2)}
 .nav{display:flex;align-items:center;gap:14px;height:64px}
 .brand{display:flex;align-items:center;gap:12px}
-.mark{width:32px;height:32px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#e9cf95,#c9a25e 46%,#7d5e2e 100%);box-shadow:0 0 0 1px rgba(0,0,0,.5),inset 0 1px 1px rgba(255,244,214,.5);display:grid;place-items:center;color:#ffffff;font-family:'Space Grotesk';font-weight:800;font-size:15px}
+.mark{width:32px;height:32px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#9fd8ff,#3d8bff 46%,#7d5e2e 100%);box-shadow:0 0 0 1px rgba(0,0,0,.5),inset 0 1px 1px rgba(255,244,214,.5);display:grid;place-items:center;color:#0b1220;font-family:'Space Grotesk';font-weight:800;font-size:15px}
 .brand b{font-family:'Space Grotesk';font-weight:800;font-size:21px;letter-spacing:5px;color:var(--ink)}
 .tag{font-style:italic;font-size:13px;color:var(--dim);border-left:1px solid var(--line2);padding-left:13px}
 .right{margin-left:auto;display:flex;align-items:center;gap:12px}
-.tnet{font-family:'Space Mono';font-size:10px;letter-spacing:.18em;color:var(--verd);border:1px solid rgba(31,138,90,.4);border-radius:2px;padding:4px 8px}
+.tnet{font-family:'Space Mono';font-size:10px;letter-spacing:.18em;color:var(--verd);border:1px solid rgba(61,220,151,.4);border-radius:2px;padding:4px 8px}
 .ico{width:34px;height:34px;border:1px solid var(--line2);border-radius:50%;display:grid;place-items:center;color:var(--dim)}
 .ico:hover{color:var(--gold);border-color:var(--gold)}
 
 /* engraved gold buttons */
 .btn{font-family:'Space Grotesk';font-weight:600;font-size:13px;letter-spacing:.16em;cursor:pointer;border:1px solid var(--gold);background:transparent;color:var(--gold);padding:10px 20px;text-transform:uppercase;transition:.15s}
-.btn:hover{background:var(--gold);color:#ffffff}
-.btn.fill{background:var(--gold);color:#ffffff}.btn.fill:hover{background:var(--gold2);border-color:var(--gold2)}
-.btn.ghost{border-color:var(--line2);color:var(--ink)}.btn.ghost:hover{background:rgba(47,87,140,.1);color:var(--gold);border-color:var(--gold)}
+.btn:hover{background:var(--gold);color:#0b1220}
+.btn.fill{background:var(--gold);color:#0b1220}.btn.fill:hover{background:var(--gold2);border-color:var(--gold2)}
+.btn.ghost{border-color:var(--line2);color:var(--ink)}.btn.ghost:hover{background:rgba(61,139,255,.1);color:var(--gold);border-color:var(--gold)}
 .btn.sm{padding:8px 14px;font-size:12px}.btn.wide{width:100%}.btn:disabled{opacity:.35;cursor:not-allowed}
 
 main{padding:20px 0 90px}
 
 /* hero — monument */
 .hero{text-align:center;padding:38px 0 26px}
-.coin{width:188px;height:188px;margin:0 auto 8px;display:block;filter:drop-shadow(0 6px 26px rgba(47,87,140,.18))}
+.coin{width:188px;height:188px;margin:0 auto 8px;display:block;filter:drop-shadow(0 6px 26px rgba(61,139,255,.18))}
 .coin .rim{animation:spin 60s linear infinite;transform-origin:100px 100px}
 @keyframes spin{to{transform:rotate(360deg)}}
 .eyebrow{font-family:'Space Mono';font-size:11px;letter-spacing:.34em;color:var(--dim);text-transform:uppercase;margin:6px 0 14px}
 .hero h1{font-family:'Space Grotesk';font-weight:700;font-size:clamp(30px,5.2vw,52px);line-height:1.12;letter-spacing:.02em}
 .hero h1 em{font-style:normal;color:var(--gold)}
 .lead{font-style:italic;font-size:19px;color:var(--dim);max-width:600px;margin:18px auto 0;line-height:1.7}.lead b{color:var(--ink);font-style:normal;font-weight:500}
-.redact{display:inline-block;background:#e9f1fb;color:transparent;border-radius:1px;padding:0 .4em;box-shadow:inset 0 0 0 1px rgba(47,87,140,.28),0 1px 2px rgba(0,0,0,.6);user-select:none}
+.redact{display:inline-block;background:#111a2e;color:transparent;border-radius:1px;padding:0 .4em;box-shadow:inset 0 0 0 1px rgba(61,139,255,.28),0 1px 2px rgba(0,0,0,.6);user-select:none}
 .cta{display:flex;gap:14px;justify-content:center;margin-top:28px;flex-wrap:wrap}
 
 /* section heading — inscription rule */
@@ -71,11 +71,11 @@ main{padding:20px 0 90px}
 .sec span::before{content:"❖";position:absolute;left:-22px;color:var(--gold);font-size:11px;top:2px}
 
 /* tablet card */
-.tablet{background:linear-gradient(180deg,var(--stone2),var(--stone));border:1px solid var(--line2);border-radius:3px;box-shadow:inset 0 0 0 1px rgba(244,248,253,.6),inset 0 0 40px rgba(0,0,0,.4);position:relative}
+.tablet{background:linear-gradient(180deg,var(--stone2),var(--stone));border:1px solid var(--line2);border-radius:3px;box-shadow:inset 0 0 0 1px rgba(5,7,12,.6),inset 0 0 40px rgba(0,0,0,.4);position:relative}
 .tablet::before,.tablet::after{content:"❖";position:absolute;color:var(--gold);font-size:10px;opacity:.7}
 .tablet::before{top:7px;left:9px}.tablet::after{bottom:7px;right:9px}
 .thead{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 22px;border-bottom:1px solid var(--line);font-family:'Space Mono';font-size:11px;letter-spacing:.12em;color:var(--mut)}
-.thead .cl{margin-left:auto;color:var(--verd);border:1px solid rgba(31,138,90,.35);padding:3px 9px;border-radius:2px}
+.thead .cl{margin-left:auto;color:var(--verd);border:1px solid rgba(61,220,151,.35);padding:3px 9px;border-radius:2px}
 
 /* balances */
 .bal{display:grid;grid-template-columns:repeat(4,1fr)}
@@ -91,10 +91,10 @@ main{padding:20px 0 90px}
 .tabs button{flex:1;background:none;border:none;border-right:1px solid var(--line);color:var(--dim);font-family:'Space Grotesk';font-weight:600;font-size:12.5px;letter-spacing:.14em;padding:14px;cursor:pointer;text-transform:uppercase;transition:.15s;border-bottom:2px solid transparent}
 .tabs button:last-child{border-right:none}
 .tabs button:hover{color:var(--ink)}
-.tabs button.on{color:var(--gold);border-bottom-color:var(--gold);background:rgba(47,87,140,.05)}
+.tabs button.on{color:var(--gold);border-bottom-color:var(--gold);background:rgba(61,139,255,.05)}
 .panel{padding:24px 22px}
 .note{font-size:16px;color:var(--dim);line-height:1.65;margin-bottom:16px}.note b{color:var(--ink);font-weight:500}
-.field{display:flex;align-items:center;gap:10px;border:1px solid var(--line2);background:#e9f1fb;border-radius:2px;padding:5px 6px 5px 15px;margin-bottom:12px}
+.field{display:flex;align-items:center;gap:10px;border:1px solid var(--line2);background:#111a2e;border-radius:2px;padding:5px 6px 5px 15px;margin-bottom:12px}
 .field input{flex:1;background:none;border:none;outline:none;color:var(--ink);font-family:'Space Mono';font-size:16px;padding:9px 0}
 .field .u{font-family:'Space Grotesk';color:var(--gold);font-size:13px;letter-spacing:.08em;padding-right:8px}
 .field .mx{font-family:'Space Mono';font-size:11px;color:var(--gold);border:1px solid var(--line2);padding:7px 11px;cursor:pointer;border-radius:2px}
@@ -113,18 +113,18 @@ main{padding:20px 0 90px}
 .led .r{display:flex;align-items:center;gap:14px;padding:13px 18px;border-bottom:1px solid var(--line);font-size:14px}
 .led .r:last-child{border-bottom:none}
 .led .ty{font-family:'Space Mono';font-size:10px;letter-spacing:.12em;padding:3px 8px;border:1px solid var(--line2);border-radius:2px;text-transform:uppercase;min-width:78px;text-align:center;color:var(--dim)}
-.led .ty.private{color:#ffffff;background:var(--gold);border-color:var(--gold)}.led .ty.shield{color:var(--verd);border-color:rgba(31,138,90,.4)}
-.vig{display:grid;grid-template-columns:repeat(5,1fr);background:linear-gradient(180deg,#eef4fc,var(--stone));border:1px solid rgba(31,138,90,.4);border-radius:3px;position:relative;overflow:hidden}
-.vig::before{content:"";position:absolute;inset:0;background:radial-gradient(60% 90% at 50% -20%,rgba(31,138,90,.16),transparent 70%);pointer-events:none}
-.vig .stat .v{color:var(--ink)}.vig .stat .v.g{color:var(--verd);text-shadow:0 0 18px rgba(31,138,90,.4)}
+.led .ty.private{color:#0b1220;background:var(--gold);border-color:var(--gold)}.led .ty.shield{color:var(--verd);border-color:rgba(61,220,151,.4)}
+.vig{display:grid;grid-template-columns:repeat(5,1fr);background:linear-gradient(180deg,#111a2e,var(--stone));border:1px solid rgba(61,220,151,.4);border-radius:3px;position:relative;overflow:hidden}
+.vig::before{content:"";position:absolute;inset:0;background:radial-gradient(60% 90% at 50% -20%,rgba(61,220,151,.16),transparent 70%);pointer-events:none}
+.vig .stat .v{color:var(--ink)}.vig .stat .v.g{color:var(--verd);text-shadow:0 0 18px rgba(61,220,151,.4)}
 .vig-note{font-size:14px;color:var(--dim);font-style:italic;margin:12px 2px 0}.vig-note b{font-style:normal;color:var(--verd)}
-.tmp{font-family:'Space Mono';font-size:10px;letter-spacing:.2em;color:#ffffff;background:var(--verd);padding:3px 7px;border-radius:2px;margin-left:12px;vertical-align:middle}
+.tmp{font-family:'Space Mono';font-size:10px;letter-spacing:.2em;color:#0b1220;background:var(--verd);padding:3px 7px;border-radius:2px;margin-left:12px;vertical-align:middle}
 .rite3{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .r3{background:linear-gradient(180deg,var(--stone2),var(--stone));border:1px solid var(--line2);border-radius:3px;padding:20px 22px}
 .r3 .k{font-family:'Space Mono';font-size:10px;letter-spacing:.2em;color:var(--verd);text-transform:uppercase}
 .r3 h3{font-family:'Space Grotesk';font-weight:700;font-size:20px;margin:8px 0 8px;color:var(--gold2)}
 .r3 p{font-size:15px;color:var(--dim);line-height:1.6;margin:0}.r3 p b{color:var(--ink);font-weight:500}
-.linkbox{display:flex;gap:8px;align-items:center;margin-top:12px;border:1px solid var(--line2);background:#e9f1fb;padding:8px 10px;border-radius:2px}
+.linkbox{display:flex;gap:8px;align-items:center;margin-top:12px;border:1px solid var(--line2);background:#111a2e;padding:8px 10px;border-radius:2px}
 .linkbox code{flex:1;font-family:'Space Mono';font-size:12px;color:var(--gold);word-break:break-all}
 .linkbox button{font-family:'Space Grotesk';font-size:11px;letter-spacing:.1em;border:1px solid var(--gold);background:none;color:var(--gold);padding:6px 10px;cursor:pointer}
 @media(max-width:720px){.rite3{grid-template-columns:1fr}}
@@ -132,16 +132,16 @@ main{padding:20px 0 90px}
 .tape .m{flex:1;padding:12px 10px;text-align:center;border-right:1px solid var(--line)}.tape .m:last-child{border-right:none}
 .tape .s{font-family:'Space Grotesk';font-weight:700;font-size:13px;letter-spacing:.1em;color:var(--gold)}.tape .p{font-family:'Space Mono';font-size:13px;color:var(--ink);margin-top:4px}.tape .m.closed .p{color:var(--mut)}
 .tape .st{font-family:'Space Mono';font-size:9px;letter-spacing:.14em;color:var(--verd);margin-top:3px;text-transform:uppercase}.tape .m.closed .st{color:var(--mut)}
-.dark{display:grid;grid-template-columns:repeat(4,1fr);background:linear-gradient(180deg,#f4f8fd,var(--stone));border:1px solid rgba(47,87,140,.4);border-radius:3px;margin-top:14px}
+.dark{display:grid;grid-template-columns:repeat(4,1fr);background:linear-gradient(180deg,#05070c,var(--stone));border:1px solid rgba(61,139,255,.4);border-radius:3px;margin-top:14px}
 .dark .stat .v{color:var(--gold2)}
 .pos{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line);font-size:14px}.pos b{font-family:'Space Grotesk';color:var(--gold)}.pos .pnl{margin-left:auto;font-family:'Space Mono';font-weight:500}.pos .pnl.up{color:var(--verd)}.pos .pnl.dn{color:var(--red)}
 .pos button{font-family:'Space Grotesk';font-size:10px;letter-spacing:.1em;border:1px solid var(--line2);background:none;color:var(--dim);padding:5px 9px;cursor:pointer}.pos button:hover{color:var(--gold);border-color:var(--gold)}
 .led .ty.burn{color:#d8503a;border-color:rgba(216,80,58,.45)}
-.pyre{display:grid;grid-template-columns:repeat(4,1fr);background:linear-gradient(180deg,#e9f1fb,var(--stone));border:1px solid rgba(216,80,58,.35);border-radius:3px;position:relative;overflow:hidden}
+.pyre{display:grid;grid-template-columns:repeat(4,1fr);background:linear-gradient(180deg,#111a2e,var(--stone));border:1px solid rgba(216,80,58,.35);border-radius:3px;position:relative;overflow:hidden}
 .pyre::before{content:"";position:absolute;inset:0;background:radial-gradient(60% 90% at 50% 120%,rgba(216,80,58,.22),transparent 70%);pointer-events:none}
-.pyre .stat .v{color:#e9cf95}.pyre .stat .v.fire{color:#d8503a;text-shadow:0 0 18px rgba(216,80,58,.5)}
+.pyre .stat .v{color:#9fd8ff}.pyre .stat .v.fire{color:#d8503a;text-shadow:0 0 18px rgba(216,80,58,.5)}
 .pyre-note{font-size:14px;color:var(--dim);font-style:italic;margin:12px 2px 0}.pyre-note b{font-style:normal;color:#d8503a}
-.newtag{font-family:'Space Mono';font-size:10px;letter-spacing:.2em;color:#ffffff;background:#d8503a;padding:3px 7px;border-radius:2px;margin-left:12px;vertical-align:middle}
+.newtag{font-family:'Space Mono';font-size:10px;letter-spacing:.2em;color:#0b1220;background:#d8503a;padding:3px 7px;border-radius:2px;margin-left:12px;vertical-align:middle}
 .led .sg{font-family:'Space Mono';font-size:13px;color:var(--mut)}.led .am{margin-left:auto;font-family:'Space Grotesk';font-weight:600;color:var(--ink)}
 
 /* roadmap — inscription */
@@ -154,7 +154,7 @@ main{padding:20px 0 90px}
 .ph .t{font-family:'Space Grotesk';font-weight:600;font-size:18px;letter-spacing:.04em;color:var(--ink)}
 .ph .d{font-size:15.5px;color:var(--dim);margin-top:5px;line-height:1.6;max-width:600px}
 .ph .st{margin-left:auto;font-family:'Space Mono';font-size:10px;letter-spacing:.1em;padding:4px 9px;height:fit-content;border:1px solid var(--line2);border-radius:2px;color:var(--mut);text-transform:uppercase}
-.ph.now .st{color:#ffffff;background:var(--gold);border-color:var(--gold)}
+.ph.now .st{color:#0b1220;background:var(--gold);border-color:var(--gold)}
 
 /* how */
 .how{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
@@ -166,7 +166,7 @@ main{padding:20px 0 90px}
 .ca{display:flex;align-items:center;justify-content:center;gap:13px;flex-wrap:wrap;margin:30px auto 0;padding:14px 18px;border:1px solid var(--line2);border-radius:3px;background:var(--stone)}
 .ca .t{font-family:'Space Grotesk';font-size:11px;color:var(--gold);letter-spacing:.12em;text-transform:uppercase}.ca code{font-family:'Space Mono';font-size:12px;color:var(--ink);word-break:break-all}
 .ca button{font-family:'Space Mono';font-size:10px;letter-spacing:.06em;border:1px solid var(--line2);background:none;color:var(--gold);padding:7px 11px;cursor:pointer;border-radius:2px}
-.disc{margin:20px auto 0;border:1px solid rgba(201,65,58,.4);background:rgba(201,65,58,.05);border-radius:3px;padding:17px 19px;font-size:14.5px;line-height:1.65;color:#d8b9ab}
+.disc{margin:20px auto 0;border:1px solid rgba(255,92,108,.4);background:rgba(255,92,108,.05);border-radius:3px;padding:17px 19px;font-size:14.5px;line-height:1.65;color:#d8b9ab}
 .disc .h{font-family:'Space Grotesk';font-weight:700;letter-spacing:.14em;color:var(--ox);margin-bottom:7px;text-transform:uppercase;font-size:13px}.disc b{color:var(--ink);font-weight:500}
 footer{text-align:center;color:var(--mut);font-style:italic;font-size:14px;padding:30px 0 16px}
 
@@ -174,19 +174,19 @@ footer{text-align:center;color:var(--mut);font-style:italic;font-size:14px;paddi
 .mcard{width:min(440px,92vw);background:linear-gradient(180deg,var(--stone2),var(--stone));border:1px solid var(--line2);border-radius:3px;padding:26px}
 .mcard h3{font-family:'Space Grotesk';font-weight:600;letter-spacing:.06em;font-size:20px;margin-bottom:9px;color:var(--ink)}
 .mcard p{color:var(--dim);font-size:15.5px;line-height:1.6;margin-bottom:16px}
-.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(16px);z-index:90;background:var(--gold);color:#ffffff;font-family:'Space Grotesk';font-weight:600;letter-spacing:.04em;font-size:14px;padding:12px 20px;border-radius:2px;opacity:0;transition:.22s;pointer-events:none}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(16px);z-index:90;background:var(--gold);color:#0b1220;font-family:'Space Grotesk';font-weight:600;letter-spacing:.04em;font-size:14px;padding:12px 20px;border-radius:2px;opacity:0;transition:.22s;pointer-events:none}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}.toast.err{background:var(--ox);color:#fff}
 @media(max-width:780px){.bal{grid-template-columns:1fr 1fr}.read{grid-template-columns:1fr 1fr 1fr}.how{grid-template-columns:1fr}.tag{display:none}}
-.faq{max-width:860px;margin:0 auto}.faq details{border-top:1px solid var(--line2);padding:2px 0}.faq details:last-child{border-bottom:1px solid var(--line2)}.faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:20px;font-family:'Space Grotesk';font-weight:600;font-size:15px;letter-spacing:.06em;color:var(--bone,#1b3158);padding:16px 4px}.faq summary::-webkit-details-marker{display:none}.faq summary::after{content:"❖";color:var(--gold);font-size:13px;transition:transform .25s;flex:none}.faq details[open] summary::after{transform:rotate(45deg)}.faq .a{font-family:'DM Sans',serif;font-size:16.5px;line-height:1.55;color:#c9bda6;padding:0 4px 18px;max-width:64ch}.faq .a b{color:var(--gold);font-weight:600}.faq .a i{color:var(--verd);font-style:normal}
+.faq{max-width:860px;margin:0 auto}.faq details{border-top:1px solid var(--line2);padding:2px 0}.faq details:last-child{border-bottom:1px solid var(--line2)}.faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:20px;font-family:'Space Grotesk';font-weight:600;font-size:15px;letter-spacing:.06em;color:var(--bone,#e8f0ff);padding:16px 4px}.faq summary::-webkit-details-marker{display:none}.faq summary::after{content:"❖";color:var(--gold);font-size:13px;transition:transform .25s;flex:none}.faq details[open] summary::after{transform:rotate(45deg)}.faq .a{font-family:'DM Sans',serif;font-size:16.5px;line-height:1.55;color:#c9bda6;padding:0 4px 18px;max-width:64ch}.faq .a b{color:var(--gold);font-weight:600}.faq .a i{color:var(--verd);font-style:normal}
 </style>
 </head>
 <body>
 <div class="bg"></div><div class="grain"></div>
 
 <header><div class="wrap"><nav class="nav">
-  <div class="brand"><div class="mark">Ω</div><b>STYX</b><span class="tag">the coin for the crossing</span></div>
+  <div class="brand"><div class="mark">Ω</div><b>LETHE</b><span class="tag">the coin the river forgets</span></div>
   <div class="right">
-    <a class="ico" id="xbtn" href="https://x.com/StyxOnArc" target="_blank" rel="noopener" title="X">𝕏</a>
+    <a class="ico" id="xbtn" href="https://x.com/LetheOnArc" target="_blank" rel="noopener" title="X">𝕏</a>
     <button class="btn fill sm" id="connect">Connect</button>
   </div>
 </nav></div></header>
@@ -196,13 +196,13 @@ footer{text-align:center;color:var(--mut);font-style:italic;font-size:14px;paddi
     <svg class="coin" viewBox="0 0 200 200" aria-hidden="true">
       <defs>
         <radialGradient id="disc" cx="40%" cy="34%" r="70%">
-          <stop offset="0" stop-color="#dbe7f5"/><stop offset="1" stop-color="#e9f1fb"/>
+          <stop offset="0" stop-color="#16223a"/><stop offset="1" stop-color="#111a2e"/>
         </radialGradient>
       </defs>
-      <circle cx="100" cy="100" r="96" fill="url(#disc)" stroke="#c9a25e" stroke-width="2.5"/>
+      <circle cx="100" cy="100" r="96" fill="url(#disc)" stroke="#3d8bff" stroke-width="2.5"/>
       <g class="rim">
-        <circle cx="100" cy="100" r="88" fill="none" stroke="#c9a25e" stroke-width="1" stroke-dasharray="2 6" opacity=".7"/>
-        <circle cx="100" cy="100" r="82" fill="none" stroke="rgba(47,87,140,.35)" stroke-width="1"/>
+        <circle cx="100" cy="100" r="88" fill="none" stroke="#3d8bff" stroke-width="1" stroke-dasharray="2 6" opacity=".7"/>
+        <circle cx="100" cy="100" r="82" fill="none" stroke="rgba(61,139,255,.35)" stroke-width="1"/>
       </g>
       <!-- Athenian owl, olive sprig + crescent -->
       <g fill="none" stroke="#d8b873" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
@@ -217,9 +217,9 @@ footer{text-align:center;color:var(--mut);font-style:italic;font-size:14px;paddi
         <path d="M44 96 A20 20 0 0 0 58 70" opacity=".85"/>
       </g>
     </svg>
-    <div class="eyebrow">ΣΤΥΞ · the river you cross</div>
+    <div class="eyebrow">ΛΗΘΗ · the river that forgets</div>
     <h1>Private money,<br>carried <em>unseen</em>.</h1>
-    <p class="lead"><b>sUSD</b> is a fractional-algorithmic stablecoin you hold and send <b>privately</b> — shield it, and the amount &amp; both parties vanish from the ledger. The coin placed beneath the tongue, paid across the river. <b>Public when you choose; hidden when you don't.</b></p>
+    <p class="lead"><b>lUSD</b> is a fractional-algorithmic stablecoin you hold and send <b>privately</b> — shield it, and the amount &amp; both parties vanish from the ledger. The coin placed beneath the tongue, paid across the river. <b>Public when you choose; hidden when you don't.</b></p>
     <div class="cta"><button class="btn fill" id="cta-demo">Deposit USDC · Bond at −20% ↓</button><a class="btn ghost" href="#road">The rites ahead</a></div>
   </section>
 
@@ -228,12 +228,12 @@ footer{text-align:center;color:var(--mut);font-style:italic;font-size:14px;paddi
   <!-- INTERACTIVE -->
   <div class="sec"><span>The crossing · the ledger</span></div>
   <div class="tablet" id="demo">
-    <div class="thead"><span>RITE&nbsp;sUSD-001</span><span>SUBJECT · PRIVATE STABLECOIN</span><span class="cl">MARKED · UNSEEN</span></div>
+    <div class="thead"><span>RITE&nbsp;lUSD-001</span><span>SUBJECT · PRIVATE STABLECOIN</span><span class="cl">MARKED · UNSEEN</span></div>
     <div class="bal">
       <div class="b"><div class="l">USDC · collateral</div><div class="v" id="b-usdg">—</div></div>
-      <div class="b"><div class="l">STYX · share</div><div class="v" id="b-styx">—</div></div>
-      <div class="b"><div class="l">sUSD · public</div><div class="v" id="b-susd">—</div></div>
-      <div class="b priv"><div class="l">sUSD · unseen</div><div class="v"><span id="b-priv-red" class="redact">██████</span><span id="b-priv-val" style="display:none"></span><span class="reveal" id="b-priv-eye">reveal</span><span class="reveal" id="b-seal" title="generate a read-only view key">seal</span></div></div>
+      <div class="b"><div class="l">LETHE · share</div><div class="v" id="b-lethe">—</div></div>
+      <div class="b"><div class="l">lUSD · public</div><div class="v" id="b-lusd">—</div></div>
+      <div class="b priv"><div class="l">lUSD · unseen</div><div class="v"><span id="b-priv-red" class="redact">██████</span><span id="b-priv-val" style="display:none"></span><span class="reveal" id="b-priv-eye">reveal</span><span class="reveal" id="b-seal" title="generate a read-only view key">seal</span></div></div>
     </div>
     <div class="tabs">
       <button data-tab="deposit">Deposit</button><button data-tab="bond">Bonds</button><button class="on" data-tab="mint">Mint</button><button data-tab="shield">Shield</button><button data-tab="send">Send Unseen</button><button data-tab="dark">Dark Pool</button><button data-tab="vigil">The Vigil</button><button data-tab="redeem">Redeem</button>
@@ -244,17 +244,17 @@ footer{text-align:center;color:var(--mut);font-style:italic;font-size:14px;paddi
   <!-- READOUT -->
   <div class="sec"><span>The reckoning · protocol</span></div>
   <div class="read">
-    <div class="stat"><div class="l">sUSD peg</div><div class="v peg at" id="s-peg">$—</div></div>
+    <div class="stat"><div class="l">lUSD peg</div><div class="v peg at" id="s-peg">$—</div></div>
     <div class="stat"><div class="l">collateral ratio</div><div class="v" id="s-cr">—</div></div>
     <div class="stat"><div class="l">in reserve</div><div class="v" id="s-col">—</div></div>
-    <div class="stat"><div class="l">sUSD struck</div><div class="v" id="s-sup">—</div></div>
+    <div class="stat"><div class="l">lUSD struck</div><div class="v" id="s-sup">—</div></div>
     <div class="stat"><div class="l">carried unseen</div><div class="v" id="s-shd">—</div></div>
   </div>
 
   <!-- RITE III -->
   <div class="sec" id="rite3"><span>Rite III · the note &amp; the seal<span class="tmp" style="background:var(--gold)">NEW</span></span></div>
   <div class="rite3">
-    <div class="r3"><div class="k">The Note · pay anyone, no address</div><h3>Send private dollars as a link.</h3><p>Lock shielded sUSD behind a secret. Whoever opens the link claims it into <b>their own</b> shielded balance. No recipient is ever named, on the ledger it is one nullifier and one commitment, same as any private send. <b>Text it. DM it. Print it as a QR.</b></p></div>
+    <div class="r3"><div class="k">The Note · pay anyone, no address</div><h3>Send private dollars as a link.</h3><p>Lock shielded lUSD behind a secret. Whoever opens the link claims it into <b>their own</b> shielded balance. No recipient is ever named, on the ledger it is one nullifier and one commitment, same as any private send. <b>Text it. DM it. Print it as a QR.</b></p></div>
     <div class="r3"><div class="k">The Seal · selective disclosure</div><h3>Prove it to one person. Hide it from everyone else.</h3><p>Generate a <b>view key</b> for your wallet. Whoever holds it can read your shielded balance and history on a sealed statement page. It <b>can never spend</b>. Give it to an accountant, a partner, a regulator — and to nobody else.</p></div>
   </div>
 
@@ -267,24 +267,24 @@ footer{text-align:center;color:var(--mut);font-style:italic;font-size:14px;paddi
     <div class="stat"><div class="l">volume crossed</div><div class="v" id="dk-vol">—</div></div>
     <div class="stat"><div class="l">fees → the pyre</div><div class="v" id="dk-fees">—</div></div>
   </div>
-  <div class="pyre-note">Take exposure to <b>tokenized stocks with shielded sUSD</b>. Long or short, 1x, priced off the live exchange tape. Ticker, size, side and P&amp;L stay inside the shield — the ledger sees one nullifier and one commitment, same as any private send. <b>30 bps</b> each way to The Pyre. Trades only clear while the tape is live.</div>
+  <div class="pyre-note">Take exposure to <b>tokenized stocks with shielded lUSD</b>. Long or short, 1x, priced off the live exchange tape. Ticker, size, side and P&amp;L stay inside the shield — the ledger sees one nullifier and one commitment, same as any private send. <b>30 bps</b> each way to The Pyre. Trades only clear while the tape is live.</div>
 
   <!-- BONDS -->
-  <div class="sec" id="bonds"><span>Bonds &amp; The Forge · deposit USDC, take $STYX at a discount, lock it, earn<span class="tmp" style="background:var(--red);color:#fff">−30%</span><span class="tmp" style="background:var(--gold)">80% APY</span></span></div>
-  <div class="pyre" style="border-color:rgba(47,87,140,.5);background:linear-gradient(180deg,#eef4fc,var(--stone))">
-    <div class="stat"><div class="l">bond price · $STYX</div><div class="v" id="bd-price" style="color:var(--gold2)">—</div></div>
+  <div class="sec" id="bonds"><span>Bonds &amp; The Forge · deposit USDC, take $LETHE at a discount, lock it, earn<span class="tmp" style="background:var(--red);color:#fff">−30%</span><span class="tmp" style="background:var(--gold)">80% APY</span></span></div>
+  <div class="pyre" style="border-color:rgba(61,139,255,.5);background:linear-gradient(180deg,#111a2e,var(--stone))">
+    <div class="stat"><div class="l">bond price · $LETHE</div><div class="v" id="bd-price" style="color:var(--gold2)">—</div></div>
     <div class="stat"><div class="l">market price</div><div class="v" id="bd-market">—</div></div>
     <div class="stat"><div class="l">capacity left today</div><div class="v" id="bd-left">—</div></div>
     <div class="stat"><div class="l">bonded so far</div><div class="v" id="bd-sold">—</div></div>
-    <div class="stat"><div class="l">forge price · $STYX</div><div class="v" id="fg-price" style="color:var(--gold2)">—</div></div>
+    <div class="stat"><div class="l">forge price · $LETHE</div><div class="v" id="fg-price" style="color:var(--gold2)">—</div></div>
     <div class="stat"><div class="l">locked in the forge</div><div class="v" id="fg-locked">—</div></div>
   </div>
-  <div class="pyre-note">Deposit USDC and take <b>$STYX at 20% below market</b>, vesting linearly over <b>5 days</b>. The USDC goes straight into the reserve and mints <b>nothing</b>, so every bond makes sUSD more collateralized. Daily capacity is capped, first come first served. Minimum 50 USDC.<br><br><b>🔥 THE FORGE.</b> Lock your bond instead. Take <b>$STYX at 30% below market</b>, locked <b>48 hours</b>, and the locked STYX <b>earns 80% APY in $STYX</b> the whole time, paid from the Vigil's fixed pool. Nothing printed. Bond, lock, earn, unlock.</div>
+  <div class="pyre-note">Deposit USDC and take <b>$LETHE at 20% below market</b>, vesting linearly over <b>5 days</b>. The USDC goes straight into the reserve and mints <b>nothing</b>, so every bond makes lUSD more collateralized. Daily capacity is capped, first come first served. Minimum 50 USDC.<br><br><b>🔥 THE FORGE.</b> Lock your bond instead. Take <b>$LETHE at 30% below market</b>, locked <b>48 hours</b>, and the locked LETHE <b>earns 80% APY in $LETHE</b> the whole time, paid from the Vigil's fixed pool. Nothing printed. Bond, lock, earn, unlock.</div>
 
   <!-- CHARON'S CUT -->
   <div class="sec" id="ferry"><span>Referrals · earn from every crossing<span class="tmp" style="background:var(--gold)">NEW</span></span></div>
   <div class="rite3">
-    <div class="r3"><div class="k">how it works</div><h3>Refer someone. Earn 20% of every toll they pay. Forever.</h3><p>Anyone who claims your <b>Note</b>, or arrives through your <b>referral link</b>, is your referral. From then on <b>20% of every toll they ever pay</b> — shield, send, unshield, redeem — is credited to you in sUSD. Not once. Every time. The Pyre takes the other 80%.</p>
+    <div class="r3"><div class="k">how it works</div><h3>Refer someone. Earn 20% of every toll they pay. Forever.</h3><p>Anyone who claims your <b>Note</b>, or arrives through your <b>referral link</b>, is your referral. From then on <b>20% of every toll they ever pay</b> — shield, send, unshield, redeem — is credited to you in lUSD. Not once. Every time. The Pyre takes the other 80%.</p>
       <div class="linkbox" id="ferrybox" style="display:none"><code id="ferrylink"></code><button id="ferrycopy">Copy</button></div>
       <div class="kv" style="margin-top:10px"><span>people you referred</span><b id="f-souls">—</b></div><div class="kv"><span>earned from their tolls</span><b id="f-earned">—</b></div></div>
     <div class="r3"><div class="k">top referrers</div><div class="led" id="ferryboard" style="margin-top:10px"></div>
@@ -294,23 +294,23 @@ footer{text-align:center;color:var(--mut);font-style:italic;font-size:14px;paddi
   <!-- THE VIGIL -->
   <div class="sec" id="vigil"><span>The vigil · temporary staking<span class="tmp">30 DAYS</span></span></div>
   <div class="vig">
-    <div class="stat"><div class="l">APY · paid in $STYX</div><div class="v g" id="v-apy">—</div><div class="l" id="v-boost" style="margin-top:6px;color:var(--verd)"></div></div>
-    <div class="stat"><div class="l">sUSD keeping vigil</div><div class="v" id="v-staked">—</div></div>
+    <div class="stat"><div class="l">APY · paid in $LETHE</div><div class="v g" id="v-apy">—</div><div class="l" id="v-boost" style="margin-top:6px;color:var(--verd)"></div></div>
+    <div class="stat"><div class="l">lUSD keeping vigil</div><div class="v" id="v-staked">—</div></div>
     <div class="stat"><div class="l">reward pool left</div><div class="v" id="v-pool">—</div></div>
     <div class="stat"><div class="l">ends in</div><div class="v" id="v-ends">—</div></div>
     <div class="stat"><div class="l">watchers</div><div class="v" id="v-n">—</div></div>
   </div>
-  <div class="vig-note">Temporary by design. Stake sUSD for <b>30 days</b> and earn a fixed APY paid in <b>$STYX from a pre-funded treasury pool</b>. Nothing is printed, no sUSD is created, and when the pool or the clock runs out the vigil ends. <b>This is how you avoid the Anchor problem:</b> a yield that has an end date cannot become the thing holding up the peg.</div>
+  <div class="vig-note">Temporary by design. Stake lUSD for <b>30 days</b> and earn a fixed APY paid in <b>$LETHE from a pre-funded treasury pool</b>. Nothing is printed, no lUSD is created, and when the pool or the clock runs out the vigil ends. <b>This is how you avoid the Anchor problem:</b> a yield that has an end date cannot become the thing holding up the peg.</div>
 
   <!-- THE PYRE -->
   <div class="sec" id="pyre"><span>The pyre · buyback &amp; burn<span class="newtag">NEW</span></span></div>
   <div class="pyre">
-    <div class="stat"><div class="l">$STYX burned</div><div class="v fire" id="p-styx">—</div></div>
+    <div class="stat"><div class="l">$LETHE burned</div><div class="v fire" id="p-lethe">—</div></div>
     <div class="stat"><div class="l">bought back</div><div class="v" id="p-usd">—</div></div>
     <div class="stat"><div class="l">toll gathered · next burn</div><div class="v" id="p-toll">—</div></div>
     <div class="stat"><div class="l">burn epochs</div><div class="v" id="p-ep">—</div></div>
   </div>
-  <div class="pyre-note">Every crossing pays the ferryman: <b>30 bps</b> on shield, send and unshield, <b>50 bps</b> on redeem. Tolls gather in USDC and each epoch the protocol buys <b>$STYX</b> at market and burns it. The burn is public. The payer never is.</div>
+  <div class="pyre-note">Every crossing pays the ferryman: <b>30 bps</b> on shield, send and unshield, <b>50 bps</b> on redeem. Tolls gather in USDC and each epoch the protocol buys <b>$LETHE</b> at market and burns it. The burn is public. The payer never is.</div>
   <div class="led" id="pyrefeed" style="margin-top:14px"></div>
 
   <!-- LEDGER -->
@@ -320,9 +320,9 @@ footer{text-align:center;color:var(--mut);font-style:italic;font-size:14px;paddi
   <!-- ROADMAP -->
   <div class="sec" id="road"><span>The rites of passage · roadmap</span></div>
   <div class="road">
-    <div class="ph now"><div class="no">RITE I</div><div><div class="t">The ledger &amp; $STYX</div><div class="d">Real privacy primitives (commitments, nullifiers, encrypted notes) with the peg &amp; ledger kept off-chain. $STYX launches as the community/gov token.</div></div><span class="st">You are here</span></div>
+    <div class="ph now"><div class="no">RITE I</div><div><div class="t">The ledger &amp; $LETHE</div><div class="d">Real privacy primitives (commitments, nullifiers, encrypted notes) with the peg &amp; ledger kept off-chain. $LETHE launches as the community/gov token.</div></div><span class="st">You are here</span></div>
     <div class="ph now"><div class="no">RITE III</div><div><div class="t">The Note &amp; the Seal</div><div class="d">Pay-by-link private transfers and read-only view keys for selective disclosure. Shipped.</div></div><span class="st">Live</span></div>
-    <div class="ph"><div class="no">RITE II</div><div><div class="t">On-chain sUSD (Arc)</div><div class="d">Solidity contracts on Arc: deposit collateral → mint/redeem sUSD, a signed 24/7 oracle, an sUSD pool. A transparent stablecoin on Arc.</div></div><span class="st">Next</span></div>
+    <div class="ph"><div class="no">RITE II</div><div><div class="t">On-chain lUSD (Arc)</div><div class="d">Solidity contracts on Arc: deposit collateral → mint/redeem lUSD, a signed 24/7 oracle, an lUSD pool. A transparent stablecoin on Arc.</div></div><span class="st">Next</span></div>
     <div class="ph"><div class="no">RITE III</div><div><div class="t">Peg automation</div><div class="d">Algorithmic collateral-ratio control + keeper bots holding the $1 peg via arbitrage.</div></div><span class="st">Planned</span></div>
     <div class="ph"><div class="no">RITE IV</div><div><div class="t">ZK privacy</div><div class="d">Trustless shielded transfers via on-chain zero-knowledge proofs (Light Protocol). The coin truly disappears.</div></div><span class="st">Planned</span></div>
     <div class="ph"><div class="no">RITE V</div><div><div class="t">Audit &amp; mainnet</div><div class="d">Professional audits, liquidity, and mainnet launch. Nothing touches real money before it's audited.</div></div><span class="st">Planned</span></div>
@@ -331,41 +331,41 @@ footer{text-align:center;color:var(--mut);font-style:italic;font-size:14px;paddi
   <!-- HOW -->
   <div class="sec"><span>How the crossing works</span></div>
   <div class="how">
-    <div class="step"><div class="n">I</div><h3>Strike sUSD</h3><p>Deposit <b>USDC collateral</b> and burn a small <b>STYX</b> share (fractional-algorithmic) to strike $1-pegged sUSD. Redeem any time to reverse it.</p></div>
-    <div class="step"><div class="n">II</div><h3>Carry it unseen</h3><p>Move sUSD into the <b>shielded pool</b> — it becomes a note <b>encrypted only to you</b>. Your balance reads <span class="redact">████</span> on-chain.</p></div>
-    <div class="step"><div class="n">III</div><h3>Pay across the river</h3><p>Send shielded sUSD and the <b>amount &amp; both parties stay hidden</b> — the ledger keeps only a nullifier and a new commitment. Private digital cash.</p></div>
+    <div class="step"><div class="n">I</div><h3>Strike lUSD</h3><p>Deposit <b>USDC collateral</b> and burn a small <b>LETHE</b> share (fractional-algorithmic) to strike $1-pegged lUSD. Redeem any time to reverse it.</p></div>
+    <div class="step"><div class="n">II</div><h3>Carry it unseen</h3><p>Move lUSD into the <b>shielded pool</b> — it becomes a note <b>encrypted only to you</b>. Your balance reads <span class="redact">████</span> on-chain.</p></div>
+    <div class="step"><div class="n">III</div><h3>Pay across the river</h3><p>Send shielded lUSD and the <b>amount &amp; both parties stay hidden</b> — the ledger keeps only a nullifier and a new commitment. Private digital cash.</p></div>
   </div>
 
 
   <!-- FAQ -->
   <div class="sec" id="faq"><span>Questions at the crossing</span></div>
   <div class="faq">
-    <details open><summary>What is sUSD?</summary><div class="a">A dollar you can carry unseen. sUSD is a <b>fractional-algorithmic stablecoin</b> on Arc: every unit is struck from USDC collateral plus a burned share of <b>$STYX</b>, and the protocol shifts that ratio to hold the peg at $1.</div></details>
-    <details><summary>How does the peg hold?</summary><div class="a">Below $1 the collateral ratio rises, so more USDC backs each new sUSD and redemption pays out more hard collateral. Above $1 the ratio falls and more of each mint is the algorithmic share. Redemption is always open, so arbitrage pulls the price back toward the peg. <i>It is defended, not guaranteed.</i></div></details>
-    <details><summary>What does “shield” actually do?</summary><div class="a">It moves public sUSD into the shielded pool and writes a <b>note encrypted only to you</b> (x25519), a <b>commitment</b> into the Merkle tree, and nothing else. Your balance reads <span class="redact">████</span> to everyone but you.</div></details>
+    <details open><summary>What is lUSD?</summary><div class="a">A dollar you can carry unseen. lUSD is a <b>fractional-algorithmic stablecoin</b> on Arc: every unit is struck from USDC collateral plus a burned share of <b>$LETHE</b>, and the protocol shifts that ratio to hold the peg at $1.</div></details>
+    <details><summary>How does the peg hold?</summary><div class="a">Below $1 the collateral ratio rises, so more USDC backs each new lUSD and redemption pays out more hard collateral. Above $1 the ratio falls and more of each mint is the algorithmic share. Redemption is always open, so arbitrage pulls the price back toward the peg. <i>It is defended, not guaranteed.</i></div></details>
+    <details><summary>What does “shield” actually do?</summary><div class="a">It moves public lUSD into the shielded pool and writes a <b>note encrypted only to you</b> (x25519), a <b>commitment</b> into the Merkle tree, and nothing else. Your balance reads <span class="redact">████</span> to everyone but you.</div></details>
     <details><summary>What can an observer see when I send unseen?</summary><div class="a">A <b>nullifier</b> spent and a <b>new commitment</b> added. No amount, no sender, no recipient. The recipient decrypts their note with their key; nobody else can.</div></details>
-    <details><summary>Can I get back to public sUSD?</summary><div class="a">Yes. Unshield returns a private note to your public balance at any time, and Redeem burns public sUSD for your USDC collateral plus the $STYX share. <i>Private when you choose, public when you choose.</i></div></details>
-    <details><summary>What is $STYX for?</summary><div class="a">$STYX is the share token of the protocol. A small amount is <b>burned on every mint</b> and minted back on every redeem, so demand for sUSD flows into $STYX. It is also the governance token for the rites ahead.</div></details>
-    <details><summary>How do referrals work?</summary><div class="a">When someone claims your Note or connects through your referral link (<b>styxonarc.xyz/?ref=your-address</b>) for the first time, they are bound to you. <b>20% of every toll they pay from then on</b> is credited to your public sUSD balance, forever. The remaining 80% still goes to The Pyre. One referrer per wallet, set once, never changed.</div></details>
-    <details><summary>What is a Note?</summary><div class="a">A pay link. You lock shielded sUSD behind a random secret and share the link. Whoever opens it connects a wallet and the sUSD lands in <b>their</b> shielded balance. The secret is only in the link fragment; the server stores a hash of it, and the ledger shows one nullifier and one commitment, indistinguishable from a private send. <i>One claim per note.</i></div></details>
+    <details><summary>Can I get back to public lUSD?</summary><div class="a">Yes. Unshield returns a private note to your public balance at any time, and Redeem burns public lUSD for your USDC collateral plus the $LETHE share. <i>Private when you choose, public when you choose.</i></div></details>
+    <details><summary>What is $LETHE for?</summary><div class="a">$LETHE is the share token of the protocol. A small amount is <b>burned on every mint</b> and minted back on every redeem, so demand for lUSD flows into $LETHE. It is also the governance token for the rites ahead.</div></details>
+    <details><summary>How do referrals work?</summary><div class="a">When someone claims your Note or connects through your referral link (<b>letheonarc.xyz/?ref=your-address</b>) for the first time, they are bound to you. <b>20% of every toll they pay from then on</b> is credited to your public lUSD balance, forever. The remaining 80% still goes to The Pyre. One referrer per wallet, set once, never changed.</div></details>
+    <details><summary>What is a Note?</summary><div class="a">A pay link. You lock shielded lUSD behind a random secret and share the link. Whoever opens it connects a wallet and the lUSD lands in <b>their</b> shielded balance. The secret is only in the link fragment; the server stores a hash of it, and the ledger shows one nullifier and one commitment, indistinguishable from a private send. <i>One claim per note.</i></div></details>
     <details><summary>What is the Seal?</summary><div class="a">A <b>view key</b>: an HMAC over your address with a server salt, encoded with your address so the statement page can verify it. It reads your shielded balance and history. It has <b>no spending power</b>. This is the selective-disclosure model privacy coins use for audits: you choose who sees, and only they see.</div></details>
     <details><summary>Is my USDC actually deposited?</summary><div class="a">Yes. Minting starts with a real <b>USDC transfer on Arc to the treasury</b>. The server reads the transaction receipt, checks the Transfer log is from your wallet to the treasury, and only then credits your ledger. Every deposited dollar sits in the treasury address you can see on the explorer. <i>Nothing on this site is paper any more.</i></div></details>
-    <details><summary>How do I get USDC back out?</summary><div class="a">Redeem sUSD for USDC on the ledger, then <b>Withdraw</b>. Withdrawals go into a queue the treasury pays out by hand from a cold wallet, usually within 24 hours, and the payout tx hash is written next to your request. There is deliberately <b>no hot key on the server</b>.</div></details>
-    <details><summary>What is the Dark Pool?</summary><div class="a">Private exposure to tokenized stocks. You commit shielded sUSD to a long or short on HOOD, TSLA, NVDA, SPY and others, 1x, no leverage, priced off the live exchange tape. When you close, P&amp;L settles back into your shielded balance. <b>Nobody can see what you hold, how much, or which way.</b> Positions are capped per wallet and pool-wide, shorts stop out at 95% loss, and trades only clear while the tape is fresh. The protocol is the counterparty; fees go to The Pyre.</div></details>
-    <details><summary>What is The Forge?</summary><div class="a">A locked bond. Deposit USDC into the bond pool and take <b>$STYX at 30% below market</b>, but it is locked for <b>48 hours</b> instead of vesting over 5. While locked, the STYX <b>earns 80% APY, paid in $STYX</b> from the same fixed pool that pays the Vigil. At unlock you claim principal plus yield in one click. The USDC goes to the reserve and mints nothing, so the Forge deepens the collateral behind every sUSD. Closes with the Vigil on Oct 11.</div></details>
-    <details><summary>What are Bonds?</summary><div class="a">The fastest way to grow the reserve. You deposit USDC and receive <b>$STYX at 20% below market</b>, vesting linearly over 5 days, claimable as it vests and withdrawable to your wallet from the treasury. Your USDC goes into the sUSD reserve and <b>mints nothing</b>, so bonds push the collateral ratio up, not down. Capacity is capped per day and the program closes with the Vigil on Oct 11.</div></details>
-    <details><summary>What is The Vigil, and why is it temporary?</summary><div class="a">A 30-day staking window: stake sUSD, earn a fixed APY, paid in <b>$STYX from a pool the treasury set aside in advance</b>. It has a hard end date and a hard pool size. Anchor's 20% was permanent and subsidised, so it became the only reason to hold UST and the peg died with it. A yield that <i>ends</i> can't do that.</div></details>
-    <details><summary>What is The Pyre?</summary><div class="a">A ferry toll. Every shield, private send and unshield pays <b>30 bps</b>, every redeem pays <b>50 bps</b>. The toll gathers in USDC and each epoch the protocol buys <b>$STYX</b> at market and burns it, publishing a burn receipt. Usage of private money becomes permanent scarcity in the share token. <i>The burn is public. The payer never is.</i></div></details>
+    <details><summary>How do I get USDC back out?</summary><div class="a">Redeem lUSD for USDC on the ledger, then <b>Withdraw</b>. Withdrawals go into a queue the treasury pays out by hand from a cold wallet, usually within 24 hours, and the payout tx hash is written next to your request. There is deliberately <b>no hot key on the server</b>.</div></details>
+    <details><summary>What is the Dark Pool?</summary><div class="a">Private exposure to tokenized stocks. You commit shielded lUSD to a long or short on HOOD, TSLA, NVDA, SPY and others, 1x, no leverage, priced off the live exchange tape. When you close, P&amp;L settles back into your shielded balance. <b>Nobody can see what you hold, how much, or which way.</b> Positions are capped per wallet and pool-wide, shorts stop out at 95% loss, and trades only clear while the tape is fresh. The protocol is the counterparty; fees go to The Pyre.</div></details>
+    <details><summary>What is The Forge?</summary><div class="a">A locked bond. Deposit USDC into the bond pool and take <b>$LETHE at 30% below market</b>, but it is locked for <b>48 hours</b> instead of vesting over 5. While locked, the LETHE <b>earns 80% APY, paid in $LETHE</b> from the same fixed pool that pays the Vigil. At unlock you claim principal plus yield in one click. The USDC goes to the reserve and mints nothing, so the Forge deepens the collateral behind every lUSD. Closes with the Vigil on Oct 11.</div></details>
+    <details><summary>What are Bonds?</summary><div class="a">The fastest way to grow the reserve. You deposit USDC and receive <b>$LETHE at 20% below market</b>, vesting linearly over 5 days, claimable as it vests and withdrawable to your wallet from the treasury. Your USDC goes into the lUSD reserve and <b>mints nothing</b>, so bonds push the collateral ratio up, not down. Capacity is capped per day and the program closes with the Vigil on Oct 11.</div></details>
+    <details><summary>What is The Vigil, and why is it temporary?</summary><div class="a">A 30-day staking window: stake lUSD, earn a fixed APY, paid in <b>$LETHE from a pool the treasury set aside in advance</b>. It has a hard end date and a hard pool size. Anchor's 20% was permanent and subsidised, so it became the only reason to hold UST and the peg died with it. A yield that <i>ends</i> can't do that.</div></details>
+    <details><summary>What is The Pyre?</summary><div class="a">A ferry toll. Every shield, private send and unshield pays <b>30 bps</b>, every redeem pays <b>50 bps</b>. The toll gathers in USDC and each epoch the protocol buys <b>$LETHE</b> at market and burns it, publishing a burn receipt. Usage of private money becomes permanent scarcity in the share token. <i>The burn is public. The payer never is.</i></div></details>
     <details><summary>Which chain and which wallet?</summary><div class="a"><b>Arc</b> (chainId 4663). Connect any EVM wallet such as MetaMask or Rabby; the site switches the network for you. USDC is the collateral asset.</div></details>
     <details><summary>Is this safe?</summary><div class="a">Algorithmic stablecoins carry <b>real risk</b>: a peg is a mechanism, not a promise, and history has UST and Terra in it. Shielded notes are encrypted to your keys alone, so losing your keys loses the notes. Size accordingly.</div></details>
   </div>
 
-  <div class="ca" id="cabar" style="display:none"><span class="t">$STYX CA</span><code id="ca-mint"></code><button id="ca-copy">Copy</button></div>
+  <div class="ca" id="cabar" style="display:none"><span class="t">$LETHE CA</span><code id="ca-mint"></code><button id="ca-copy">Copy</button></div>
   
-  <div class="disc"><div class="h">⚠ Disclosure · read me</div><b>sUSD is a fractional-algorithmic stablecoin.</b> The peg is defended by the collateral ratio and open redemption, not guaranteed; algorithmic stablecoins carry real risk (see UST/Terra). Shielded notes are encrypted to your keys alone. Nothing here is financial advice.</div>
+  <div class="disc"><div class="h">⚠ Disclosure · read me</div><b>lUSD is a fractional-algorithmic stablecoin.</b> The peg is defended by the collateral ratio and open redemption, not guaranteed; algorithmic stablecoins carry real risk (see UST/Terra). Shielded notes are encrypted to your keys alone. Nothing here is financial advice.</div>
 </main>
 
-<footer><div class="wrap">STYX · sUSD / $STYX · a private fractional-algorithmic stablecoin · Arc · the coin you carry unseen</div></footer>
+<footer><div class="wrap">LETHE · lUSD / $LETHE · a private fractional-algorithmic stablecoin · Arc · the coin you carry unseen</div></footer>
 
 <div class="modal" id="wmodal"><div class="mcard">
   <h3>Connect wallet</h3>
